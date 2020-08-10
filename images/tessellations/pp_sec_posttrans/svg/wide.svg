@@ -1,0 +1,697 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.0//EN' 'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+
+
+<svg stroke-dasharray="none" shape-rendering="auto"
+     xmlns="http://www.w3.org/2000/svg" font-family="&apos;Dialog&apos;"
+     width="2512" text-rendering="auto" fill-opacity="1"
+     contentScriptType="text/ecmascript" color-interpolation="auto"
+     color-rendering="auto" preserveAspectRatio="xMidYMid meet" font-size="12px"
+     fill="black" xmlns:xlink="http://www.w3.org/1999/xlink" stroke="black"
+     image-rendering="auto" stroke-miterlimit="10" zoomAndPan="magnify"
+     version="1.0" stroke-linecap="square" stroke-linejoin="miter"
+     contentStyleType="text/css" font-style="normal" height="2512"
+     stroke-width="1" stroke-dashoffset="0" font-weight="normal"
+     stroke-opacity="1">
+    <!--Generated with Paver-->
+    <defs id="genericDefs"/>
+    <g>
+        <defs id="defs1">
+            <clipPath clipPathUnits="userSpaceOnUse" id="clipPath1">
+                <path d="M0 0 L2512 0 L2512 2512 L0 2512 L0 0 Z"/>
+            </clipPath>
+            <clipPath clipPathUnits="userSpaceOnUse" id="clipPath2">
+                <path d="M-6 -6 L2506 -6 L2506 2506 L-6 2506 L-6 -6 Z"/>
+            </clipPath>
+        </defs>
+        <g fill="rgb(102,102,102)" font-size="11px" font-family="sans-serif"
+           stroke="rgb(102,102,102)">
+            <rect x="0" width="2512" height="2512" y="0"
+                  clip-path="url(#clipPath1)" stroke="none"/>
+        </g>
+        <g font-size="11px" transform="translate(6,6)" fill="rgb(89,149,171)"
+           text-rendering="optimizeLegibility" image-rendering="optimizeSpeed"
+           color-rendering="optimizeSpeed" font-family="sans-serif"
+           stroke="rgb(89,149,171)" color-interpolation="sRGB">
+            <path d="M2500 145.1821 L2227.1936 0 L2500 0 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="LSM4" node-id="GS115_000147-T1" stroke="none"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(243,178,40)"
+                  node-id="GS115_002773-T1" fill-rule="evenodd"
+                  d="M137.6596 2483.29 L140.4916 2488.6191 L130.1369 2500 L124.596 2500 Z"
+                  stroke="none" node-name="ASP3-4"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(246,175,44)"
+                  node-id="GS115_003203-T1" fill-rule="evenodd"
+                  d="M0 2415.6826 L85.58 2385.2922 L137.6596 2483.29 L124.596 2500 L0 2500 Z"
+                  stroke="none" node-name="MET16"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(241,177,41)"
+                  node-id="GS115_004212-T1" fill-rule="evenodd"
+                  d="M85.58 2385.2922 L0 2415.6826 L0 2288.4529 L24.6403 2281.7949 L30.0877 2280.8728 Z"
+                  stroke="none" node-name="AOA68412.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(241,128,24)"
+                  node-id="GS115_005143-T1" fill-rule="evenodd"
+                  d="M30.0877 2280.8728 L24.6403 2281.7949 L28.0139 2276.9707 Z"
+                  stroke="none" node-name="SPR1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(114,45,5)"
+                  node-id="GS115_001648-T1" fill-rule="evenodd"
+                  d="M10.5465 2244.1025 L0 2246.644 L0 2224.2571 Z"
+                  stroke="none" node-name="YJR107W"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(135,54,2)"
+                  node-id="GS115_004533-T1" fill-rule="evenodd"
+                  d="M0 2246.644 L10.5465 2244.1025 L28.0139 2276.9707 L24.6403 2281.7949 L0 2288.4529 Z"
+                  stroke="none" node-name="NPR2"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(193,95,12)"
+                  node-id="GS115_005064-T1" fill-rule="evenodd"
+                  d="M140.4916 2488.6191 L146.5398 2500 L130.1369 2500 Z"
+                  stroke="none" node-name="AOA69767.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(174,105,158)"
+                  node-id="GS115_000490-T1" fill-rule="evenodd"
+                  d="M194.967 0 L1284.7759 0 L1292.7931 21.8379 L1182.8573 605.9667 L186.2115 34.6519 Z"
+                  stroke="none" node-name="AOA65896.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(167,110,157)"
+                  node-id="GS115_001378-T1" fill-rule="evenodd"
+                  d="M384.7527 1553.1279 L0 1938.0703 L0 1394.6774 Z"
+                  stroke="none" node-name="CCW14"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(162,106,162)"
+                  node-id="GS115_001464-T1" fill-rule="evenodd"
+                  d="M1233.9103 703.5516 L384.7527 1553.1279 L0 1394.6774 L0 134.3932 L152.5874 48.2781 L186.2115 34.6519 L1182.8573 605.9667 Z"
+                  stroke="none" node-name="SPI1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(162,104,168)"
+                  node-id="GS115_003061-T1" fill-rule="evenodd"
+                  d="M1284.7759 0 L1305.6389 0 L1307.8185 15.9543 L1292.7931 21.8379 Z"
+                  stroke="none" node-name="FLO1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(163,115,159)"
+                  node-id="GS115_003368-T1" fill-rule="evenodd"
+                  d="M138.1941 0 L152.5874 48.2781 L0 134.3932 L0 0 Z"
+                  stroke="none" node-name="KRE1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(175,111,165)"
+                  node-id="GS115_003729-T1" fill-rule="evenodd"
+                  d="M1362.9247 0 L1307.8185 15.9543 L1305.6389 0 Z"
+                  stroke="none" node-name="YNL190W"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(166,110,161)"
+                  node-id="GS115_003730-T1" fill-rule="evenodd"
+                  d="M1362.9247 0 L1439.5026 0 L1631.8514 102.071 L1673.4573 174.7206 L1692.8907 244.3447 L1233.9103 703.5516 L1182.8573 605.9667 L1292.7931 21.8379 L1307.8185 15.9543 Z"
+                  stroke="none" node-name="YNL190W"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(162,109,161)"
+                  node-id="GS115_003829-T1" fill-rule="evenodd"
+                  d="M1692.8907 244.3447 L1673.4573 174.7206 L1705.8851 231.3439 Z"
+                  stroke="none" node-name="AOA68364.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(172,106,161)"
+                  node-id="GS115_004151-T1" fill-rule="evenodd"
+                  d="M1631.8514 102.071 L1439.5026 0 L1573.396 0 Z"
+                  stroke="none" node-name="KRE1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(169,112,164)"
+                  node-id="GS115_004965-T1" fill-rule="evenodd"
+                  d="M138.1941 0 L194.967 0 L186.2115 34.6519 L152.5874 48.2781 Z"
+                  stroke="none" node-name="TIP1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(127,76,120)"
+                  node-id="GS115_000564-T1" fill-rule="evenodd"
+                  d="M1579.3584 10.4111 L1585.1809 0 L1716.5909 0 L1716.8673 6.1462 L1680.1276 94.5449 L1637.9033 112.6385 Z"
+                  stroke="none" node-name="PRB1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(122,82,126)"
+                  node-id="GS115_002879-T1" fill-rule="evenodd"
+                  d="M1637.9033 112.6385 L1680.1276 94.5449 L1758.4617 178.7414 L1705.8851 231.3439 Z"
+                  stroke="none" node-name="LCL2"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(132,82,128)"
+                  node-id="GS115_004025-T1" fill-rule="evenodd"
+                  d="M1585.1809 0 L1579.3584 10.4111 L1573.396 0 Z"
+                  stroke="none" node-name="BAR1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(122,74,127)"
+                  node-id="GS115_004338-T1" fill-rule="evenodd"
+                  d="M1824.4143 112.7563 L1758.4617 178.7414 L1680.1276 94.5449 L1716.8673 6.1462 Z"
+                  stroke="none" node-name="FPR2"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(125,72,127)"
+                  node-id="GS115_004338-T2" fill-rule="evenodd"
+                  d="M1824.4143 112.7563 L1716.8673 6.1462 L1716.5909 0 L1937.115 0 Z"
+                  stroke="none" node-name="FPR2"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(16,50,69)"
+                  node-id="GS115_000119-T1" fill-rule="evenodd"
+                  d="M0 1999.0233 L0 1938.0703 L821.5219 1116.1433 L1050.04 1193.4426 L1063.3853 1200.3811 L1068.1057 1202.9014 L1211.8297 2350.5376 L1197.8591 2367.6501 L1098.2218 2470.9802 L1082.6722 2482.509 L1057.7274 2500 L329.7592 2500 L149.8437 2325.0339 L3.5151 2024.7681 Z"
+                  stroke="none" node-name="CCA36283.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(21,48,66)"
+                  node-id="GS115_000435-T1" fill-rule="evenodd"
+                  d="M1088.4683 2500 L1057.7274 2500 L1082.6722 2482.509 Z"
+                  stroke="none" node-name="AOA66162.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(14,51,69)"
+                  node-id="GS115_000758-T1" fill-rule="evenodd"
+                  d="M2500 1142.0328 L2500 1289.8607 L2408.1184 1186.068 L2409.842 1178.9778 L2461.3857 1132.1483 Z"
+                  stroke="none" node-name="AOA66823.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(16,51,69)"
+                  node-id="GS115_001092-T1" fill-rule="evenodd"
+                  d="M1050.04 1193.4426 L1054.0259 1188.8298 L1063.3853 1200.3811 Z"
+                  stroke="none" node-name="AOA66597.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(13,45,62)"
+                  node-id="GS115_001101-T1" fill-rule="evenodd"
+                  d="M0 1999.0233 L3.5151 2024.7681 L0 2025.7203 Z"
+                  stroke="none" node-name="AOA66861.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(20,45,66)"
+                  node-id="GS115_001236-T1" fill-rule="evenodd"
+                  d="M1071.0502 1161.1155 L1098.4955 1166.0347 L1068.1057 1202.9014 L1063.3853 1200.3811 L1054.0259 1188.8298 Z"
+                  stroke="none" node-name="NPR3"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(19,44,60)"
+                  node-id="GS115_001433-T1" fill-rule="evenodd"
+                  d="M1211.8297 2350.5376 L1225.3419 2364.4043 L1197.8591 2367.6501 Z"
+                  stroke="none" node-name="AOA66093.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(23,47,69)"
+                  node-id="GS115_001435-T1" fill-rule="evenodd"
+                  d="M1390.4443 2500 L1350.6761 2500 L1356.8688 2479.2468 Z"
+                  stroke="none" node-name="AOA65944.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(16,50,67)"
+                  node-id="GS115_001616-T1" fill-rule="evenodd"
+                  d="M2500 2334.0293 L2500 2347.6912 L2479.5801 2341.4294 L2488.8743 2329.9573 Z"
+                  stroke="none" node-name="AOA66902.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(13,55,69)"
+                  node-id="GS115_001660-T1" fill-rule="evenodd"
+                  d="M2500 1121.4321 L2500 1142.0328 L2461.3857 1132.1483 L2479.7878 1112.4174 Z"
+                  stroke="none" node-name="AOA66076.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(10,43,69)"
+                  node-id="GS115_001890-T1" fill-rule="evenodd"
+                  d="M2500 2347.6912 L2500 2458.7061 L2493.9895 2460.3118 L2423.989 2401.7549 L2479.5801 2341.4294 Z"
+                  stroke="none" node-name="AOA67300.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(12,48,62)"
+                  node-id="GS115_002256-T1" fill-rule="evenodd"
+                  d="M960.5325 977.0641 L1149.6382 787.8652 L1251.6335 1031.0066 L1098.4955 1166.0347 L1071.0502 1161.1155 L963.5607 1015.9446 Z"
+                  stroke="none" node-name="AOA67261.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(23,48,66)"
+                  node-id="GS115_002512-T1" fill-rule="evenodd"
+                  d="M2500 2334.0293 L2488.8743 2329.9573 L2500 2315.824 Z"
+                  stroke="none" node-name="AOA67433.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(19,47,56)"
+                  node-id="GS115_002726-T1" fill-rule="evenodd"
+                  d="M821.5219 1116.1433 L919.3088 1018.3082 L963.5607 1015.9446 L1071.0502 1161.1155 L1054.0259 1188.8298 L1050.04 1193.4426 Z"
+                  stroke="none" node-name="AOA67185.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(17,53,56)"
+                  node-id="GS115_002726-T2" fill-rule="evenodd"
+                  d="M0 2025.7203 L3.5151 2024.7681 L149.8437 2325.0339 L77.4878 2370.0654 L0 2224.2571 Z"
+                  stroke="none" node-name="AOA67185.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(11,47,59)"
+                  node-id="GS115_002726-T3" fill-rule="evenodd"
+                  d="M77.4878 2370.0654 L149.8437 2325.0339 L329.7592 2500 L146.5398 2500 Z"
+                  stroke="none" node-name="AOA67185.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(17,44,68)"
+                  node-id="GS115_003072-T1" fill-rule="evenodd"
+                  d="M960.5325 977.0641 L963.5607 1015.9446 L919.3088 1018.3082 Z"
+                  stroke="none" node-name="AOA68414.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(11,48,65)"
+                  node-id="GS115_003192-T1" fill-rule="evenodd"
+                  d="M1350.6761 2500 L1106.8434 2500 L1098.2218 2470.9802 L1197.8591 2367.6501 L1225.3419 2364.4043 L1356.8688 2479.2468 Z"
+                  stroke="none" node-name="AOA69306.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(18,49,56)"
+                  node-id="GS115_003241-T1" fill-rule="evenodd"
+                  d="M2500 2458.7061 L2500 2495.5156 L2492.616 2495.9712 L2487.595 2494.2839 L2493.9895 2460.3118 Z"
+                  stroke="none" node-name="AOA68764.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(19,56,68)"
+                  node-id="GS115_004213-T1" fill-rule="evenodd"
+                  d="M2500 1289.8607 L2500 2315.824 L2488.8743 2329.9573 L2479.5801 2341.4294 L2423.989 2401.7549 L2314.5283 2500 L1390.4443 2500 L1356.8688 2479.2468 L1225.3419 2364.4043 L1211.8297 2350.5376 L1068.1057 1202.9014 L1098.4955 1166.0347 L1251.6335 1031.0066 L2405.0188 1182.9551 L2408.1184 1186.068 Z"
+                  stroke="none" node-name="SCV12161.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(23,54,56)"
+                  node-id="GS115_004366-T1" fill-rule="evenodd"
+                  d="M1106.8434 2500 L1088.4683 2500 L1082.6722 2482.509 L1098.2218 2470.9802 Z"
+                  stroke="none" node-name="AOA70062.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(15,54,61)"
+                  node-id="GS115_004403-T1" fill-rule="evenodd"
+                  d="M2484.988 2500 L2314.5283 2500 L2423.989 2401.7549 L2493.9895 2460.3118 L2487.595 2494.2839 Z"
+                  stroke="none" node-name="SSP120"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(15,48,69)"
+                  node-id="GS115_004410-T1" fill-rule="evenodd"
+                  d="M2492.4956 2500 L2484.988 2500 L2487.595 2494.2839 L2492.616 2495.9712 Z"
+                  stroke="none" node-name="AOA69870.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(15,55,58)"
+                  node-id="GS115_004738-T1" fill-rule="evenodd"
+                  d="M2500 2495.5156 L2500 2500 L2492.4956 2500 L2492.616 2495.9712 Z"
+                  stroke="none" node-name="AOA69566.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(16,46,59)"
+                  node-id="GS115_004770-T1" fill-rule="evenodd"
+                  d="M2500 1089.4467 L2500 1121.4321 L2479.7878 1112.4174 Z"
+                  stroke="none" node-name="AOA70251.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(12,50,61)"
+                  node-id="GS115_004771-T1" fill-rule="evenodd"
+                  d="M2409.842 1178.9778 L2408.1184 1186.068 L2405.0188 1182.9551 Z"
+                  stroke="none" node-name="AOA69648.1"/>
+            <path clip-path="url(#clipPath2)" fill="rgb(21,49,65)"
+                  node-id="GS115_005353-T1" fill-rule="evenodd"
+                  d="M2500 1089.4467 L2479.7878 1112.4174 L2461.3857 1132.1483 L2409.842 1178.9778 L2405.0188 1182.9551 L1251.6335 1031.0066 L1149.6382 787.8652 L1937.115 0 L2227.1936 0 L2500 145.1821 Z"
+                  stroke="none" node-name="XP_002494332.1"/>
+        </g>
+        <g stroke-linecap="butt" font-size="11px" transform="translate(6,6)"
+           text-rendering="optimizeLegibility" image-rendering="optimizeSpeed"
+           color-rendering="optimizeSpeed" font-family="sans-serif"
+           stroke-linejoin="bevel" color-interpolation="sRGB" stroke-width="0">
+            <path fill="none"
+                  d="M0 1999.0233 L0 1938.0703 L821.5219 1116.1433 L1050.04 1193.4426 L1063.3853 1200.3811 L1068.1057 1202.9014 L1211.8297 2350.5376 L1197.8591 2367.6501 L1098.2218 2470.9802 L1082.6722 2482.509 L1057.7274 2500 L329.7592 2500 L149.8437 2325.0339 L3.5151 2024.7681 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="CCA36283.1" node-id="GS115_000119-T1"/>
+            <path fill="none"
+                  d="M1088.4683 2500 L1057.7274 2500 L1082.6722 2482.509 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA66162.1" node-id="GS115_000435-T1"/>
+            <path fill="none"
+                  d="M2500 1142.0328 L2500 1289.8607 L2408.1184 1186.068 L2409.842 1178.9778 L2461.3857 1132.1483 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA66823.1" node-id="GS115_000758-T1"/>
+            <path fill="none"
+                  d="M1050.04 1193.4426 L1054.0259 1188.8298 L1063.3853 1200.3811 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA66597.1" node-id="GS115_001092-T1"/>
+            <path fill="none" d="M0 1999.0233 L3.5151 2024.7681 L0 2025.7203 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA66861.1" node-id="GS115_001101-T1"/>
+            <path fill="none"
+                  d="M1071.0502 1161.1155 L1098.4955 1166.0347 L1068.1057 1202.9014 L1063.3853 1200.3811 L1054.0259 1188.8298 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="NPR3" node-id="GS115_001236-T1"/>
+            <path fill="none"
+                  d="M1211.8297 2350.5376 L1225.3419 2364.4043 L1197.8591 2367.6501 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA66093.1" node-id="GS115_001433-T1"/>
+            <path fill="none"
+                  d="M1390.4443 2500 L1350.6761 2500 L1356.8688 2479.2468 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA65944.1" node-id="GS115_001435-T1"/>
+            <path fill="none"
+                  d="M2500 2334.0293 L2500 2347.6912 L2479.5801 2341.4294 L2488.8743 2329.9573 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA66902.1" node-id="GS115_001616-T1"/>
+            <path fill="none"
+                  d="M2500 1121.4321 L2500 1142.0328 L2461.3857 1132.1483 L2479.7878 1112.4174 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA66076.1" node-id="GS115_001660-T1"/>
+            <path fill="none"
+                  d="M2500 2347.6912 L2500 2458.7061 L2493.9895 2460.3118 L2423.989 2401.7549 L2479.5801 2341.4294 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA67300.1" node-id="GS115_001890-T1"/>
+            <path fill="none"
+                  d="M960.5325 977.0641 L1149.6382 787.8652 L1251.6335 1031.0066 L1098.4955 1166.0347 L1071.0502 1161.1155 L963.5607 1015.9446 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA67261.1" node-id="GS115_002256-T1"/>
+            <path fill="none"
+                  d="M2500 2334.0293 L2488.8743 2329.9573 L2500 2315.824 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA67433.1" node-id="GS115_002512-T1"/>
+            <path fill="none"
+                  d="M821.5219 1116.1433 L919.3088 1018.3082 L963.5607 1015.9446 L1071.0502 1161.1155 L1054.0259 1188.8298 L1050.04 1193.4426 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA67185.1" node-id="GS115_002726-T1"/>
+            <path fill="none"
+                  d="M0 2025.7203 L3.5151 2024.7681 L149.8437 2325.0339 L77.4878 2370.0654 L0 2224.2571 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA67185.1" node-id="GS115_002726-T2"/>
+            <path fill="none"
+                  d="M77.4878 2370.0654 L149.8437 2325.0339 L329.7592 2500 L146.5398 2500 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA67185.1" node-id="GS115_002726-T3"/>
+            <path fill="none"
+                  d="M960.5325 977.0641 L963.5607 1015.9446 L919.3088 1018.3082 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA68414.1" node-id="GS115_003072-T1"/>
+            <path fill="none"
+                  d="M1350.6761 2500 L1106.8434 2500 L1098.2218 2470.9802 L1197.8591 2367.6501 L1225.3419 2364.4043 L1356.8688 2479.2468 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA69306.1" node-id="GS115_003192-T1"/>
+            <path fill="none"
+                  d="M2500 2458.7061 L2500 2495.5156 L2492.616 2495.9712 L2487.595 2494.2839 L2493.9895 2460.3118 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA68764.1" node-id="GS115_003241-T1"/>
+            <path fill="none"
+                  d="M2500 1289.8607 L2500 2315.824 L2488.8743 2329.9573 L2479.5801 2341.4294 L2423.989 2401.7549 L2314.5283 2500 L1390.4443 2500 L1356.8688 2479.2468 L1225.3419 2364.4043 L1211.8297 2350.5376 L1068.1057 1202.9014 L1098.4955 1166.0347 L1251.6335 1031.0066 L2405.0188 1182.9551 L2408.1184 1186.068 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="SCV12161.1" node-id="GS115_004213-T1"/>
+            <path fill="none"
+                  d="M1106.8434 2500 L1088.4683 2500 L1082.6722 2482.509 L1098.2218 2470.9802 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA70062.1" node-id="GS115_004366-T1"/>
+            <path fill="none"
+                  d="M2484.988 2500 L2314.5283 2500 L2423.989 2401.7549 L2493.9895 2460.3118 L2487.595 2494.2839 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="SSP120" node-id="GS115_004403-T1"/>
+            <path fill="none"
+                  d="M2492.4956 2500 L2484.988 2500 L2487.595 2494.2839 L2492.616 2495.9712 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA69870.1" node-id="GS115_004410-T1"/>
+            <path fill="none"
+                  d="M2500 2495.5156 L2500 2500 L2492.4956 2500 L2492.616 2495.9712 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA69566.1" node-id="GS115_004738-T1"/>
+            <path fill="none"
+                  d="M2500 1089.4467 L2500 1121.4321 L2479.7878 1112.4174 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA70251.1" node-id="GS115_004770-T1"/>
+            <path fill="none"
+                  d="M2409.842 1178.9778 L2408.1184 1186.068 L2405.0188 1182.9551 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA69648.1" node-id="GS115_004771-T1"/>
+            <path fill="none"
+                  d="M2500 1089.4467 L2479.7878 1112.4174 L2461.3857 1132.1483 L2409.842 1178.9778 L2405.0188 1182.9551 L1251.6335 1031.0066 L1149.6382 787.8652 L1937.115 0 L2227.1936 0 L2500 145.1821 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="XP_002494332.1" node-id="GS115_005353-T1"/>
+            <path fill="none"
+                  d="M1579.3584 10.4111 L1585.1809 0 L1716.5909 0 L1716.8673 6.1462 L1680.1276 94.5449 L1637.9033 112.6385 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="PRB1" node-id="GS115_000564-T1"/>
+            <path fill="none"
+                  d="M1637.9033 112.6385 L1680.1276 94.5449 L1758.4617 178.7414 L1705.8851 231.3439 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="LCL2" node-id="GS115_002879-T1"/>
+            <path fill="none" d="M1585.1809 0 L1579.3584 10.4111 L1573.396 0 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="BAR1" node-id="GS115_004025-T1"/>
+            <path fill="none"
+                  d="M1824.4143 112.7563 L1758.4617 178.7414 L1680.1276 94.5449 L1716.8673 6.1462 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="FPR2" node-id="GS115_004338-T1"/>
+            <path fill="none"
+                  d="M1824.4143 112.7563 L1716.8673 6.1462 L1716.5909 0 L1937.115 0 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="FPR2" node-id="GS115_004338-T2"/>
+            <path fill="none"
+                  d="M194.967 0 L1284.7759 0 L1292.7931 21.8379 L1182.8573 605.9667 L186.2115 34.6519 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA65896.1" node-id="GS115_000490-T1"/>
+            <path fill="none"
+                  d="M384.7527 1553.1279 L0 1938.0703 L0 1394.6774 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="CCW14" node-id="GS115_001378-T1"/>
+            <path fill="none"
+                  d="M1233.9103 703.5516 L384.7527 1553.1279 L0 1394.6774 L0 134.3932 L152.5874 48.2781 L186.2115 34.6519 L1182.8573 605.9667 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="SPI1" node-id="GS115_001464-T1"/>
+            <path fill="none"
+                  d="M1284.7759 0 L1305.6389 0 L1307.8185 15.9543 L1292.7931 21.8379 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="FLO1" node-id="GS115_003061-T1"/>
+            <path fill="none"
+                  d="M138.1941 0 L152.5874 48.2781 L0 134.3932 L0 0 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="KRE1" node-id="GS115_003368-T1"/>
+            <path fill="none" d="M1362.9247 0 L1307.8185 15.9543 L1305.6389 0 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="YNL190W" node-id="GS115_003729-T1"/>
+            <path fill="none"
+                  d="M1362.9247 0 L1439.5026 0 L1631.8514 102.071 L1673.4573 174.7206 L1692.8907 244.3447 L1233.9103 703.5516 L1182.8573 605.9667 L1292.7931 21.8379 L1307.8185 15.9543 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="YNL190W" node-id="GS115_003730-T1"/>
+            <path fill="none"
+                  d="M1692.8907 244.3447 L1673.4573 174.7206 L1705.8851 231.3439 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA68364.1" node-id="GS115_003829-T1"/>
+            <path fill="none" d="M1631.8514 102.071 L1439.5026 0 L1573.396 0 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="KRE1" node-id="GS115_004151-T1"/>
+            <path fill="none"
+                  d="M138.1941 0 L194.967 0 L186.2115 34.6519 L152.5874 48.2781 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="TIP1" node-id="GS115_004965-T1"/>
+            <path fill="none"
+                  d="M140.4916 2488.6191 L146.5398 2500 L130.1369 2500 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA69767.1" node-id="GS115_005064-T1"/>
+            <path fill="none"
+                  d="M0 2246.644 L10.5465 2244.1025 L28.0139 2276.9707 L24.6403 2281.7949 L0 2288.4529 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="NPR2" node-id="GS115_004533-T1"/>
+            <path fill="none" d="M10.5465 2244.1025 L0 2246.644 L0 2224.2571 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="YJR107W" node-id="GS115_001648-T1"/>
+            <path fill="none"
+                  d="M30.0877 2280.8728 L24.6403 2281.7949 L28.0139 2276.9707 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="SPR1" node-id="GS115_005143-T1"/>
+            <path fill="none"
+                  d="M137.6596 2483.29 L140.4916 2488.6191 L130.1369 2500 L124.596 2500 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="ASP3-4" node-id="GS115_002773-T1"/>
+            <path fill="none"
+                  d="M0 2415.6826 L85.58 2385.2922 L137.6596 2483.29 L124.596 2500 L0 2500 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="MET16" node-id="GS115_003203-T1"/>
+            <path fill="none"
+                  d="M85.58 2385.2922 L0 2415.6826 L0 2288.4529 L24.6403 2281.7949 L30.0877 2280.8728 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="AOA68412.1" node-id="GS115_004212-T1"/>
+            <path fill="none" d="M2500 145.1821 L2227.1936 0 L2500 0 Z"
+                  clip-path="url(#clipPath2)" fill-rule="evenodd"
+                  node-name="LSM4" node-id="GS115_000147-T1"/>
+            <path clip-path="url(#clipPath2)" fill="none"
+                  node-id="Function Unknown" fill-rule="evenodd"
+                  d="M0 2224.2571 L0 1938.0703 L1937.115 0 L2227.1936 0 L2500 145.1821 L2500 2500 L146.5398 2500 Z"
+                  stroke-width="1.3513" node-name="Function Unknown"/>
+            <path clip-path="url(#clipPath2)" fill="none"
+                  node-id="Cell Wall/Membrane/Envelope Biogenesis"
+                  fill-rule="evenodd"
+                  d="M1573.396 0 L1705.8851 231.3439 L0 1938.0703 L0 0 Z"
+                  stroke-width="1.3513"
+                  node-name="Cell Wall/Membrane/Envelope Biogenesis"/>
+            <path clip-path="url(#clipPath2)" fill="none"
+                  node-id="Post-Translational Modification, Protein Turnover and Chaperones"
+                  fill-rule="evenodd"
+                  d="M1573.396 0 L1937.115 0 L1705.8851 231.3439 Z"
+                  stroke-width="1.3513"
+                  node-name="Post-Translational Modification, Protein Turnover and Chaperones"/>
+            <path clip-path="url(#clipPath2)" fill="none"
+                  node-id="Amino Acid Transport and Metabolism"
+                  fill-rule="evenodd"
+                  d="M0 2288.4529 L24.6403 2281.7949 L30.0877 2280.8728 L140.4916 2488.6191 L130.1369 2500 L0 2500 Z"
+                  stroke-width="1.3513"
+                  node-name="Amino Acid Transport and Metabolism"/>
+            <path clip-path="url(#clipPath2)" fill="none"
+                  node-id="Carbohydrate Transport and Metabolism"
+                  fill-rule="evenodd"
+                  d="M30.0877 2280.8728 L24.6403 2281.7949 L28.0139 2276.9707 Z"
+                  stroke-width="1.3513"
+                  node-name="Carbohydrate Transport and Metabolism"/>
+            <path clip-path="url(#clipPath2)" fill="none"
+                  node-id="Lipid Transport and Metabolism" fill-rule="evenodd"
+                  d="M10.5465 2244.1025 L0 2246.644 L0 2224.2571 Z"
+                  stroke-width="1.3513"
+                  node-name="Lipid Transport and Metabolism"/>
+            <path clip-path="url(#clipPath2)" fill="none"
+                  node-id="Inorganic Ion Transport and Metabolism"
+                  fill-rule="evenodd"
+                  d="M0 2246.644 L10.5465 2244.1025 L28.0139 2276.9707 L24.6403 2281.7949 L0 2288.4529 Z"
+                  stroke-width="1.3513"
+                  node-name="Inorganic Ion Transport and Metabolism"/>
+            <path clip-path="url(#clipPath2)" fill="none"
+                  node-id="Secondary Metabolites Biosynthesis, Transport and Catabolism"
+                  fill-rule="evenodd"
+                  d="M140.4916 2488.6191 L146.5398 2500 L130.1369 2500 Z"
+                  stroke-width="1.3513"
+                  node-name="Secondary Metabolites Biosynthesis, Transport and Catabolism"/>
+            <path clip-path="url(#clipPath2)" fill="none"
+                  node-id="RNA Processing and Modification" fill-rule="evenodd"
+                  d="M2500 145.1821 L2227.1936 0 L2500 0 Z"
+                  stroke-width="1.3513"
+                  node-name="RNA Processing and Modification"/>
+            <path clip-path="url(#clipPath2)" fill="none"
+                  node-id="Information Storage and Processing"
+                  fill-rule="evenodd" d="M2500 145.1821 L2227.1936 0 L2500 0 Z"
+                  stroke-width="4.5288"
+                  node-name="Information Storage and Processing"/>
+            <path clip-path="url(#clipPath2)" fill="none" node-id="Metabolism"
+                  fill-rule="evenodd" d="M0 2224.2571 L146.5398 2500 L0 2500 Z"
+                  stroke-width="4.5288" node-name="Metabolism"/>
+            <path clip-path="url(#clipPath2)" fill="none"
+                  node-id="Cellular Processes and Signaling" fill-rule="evenodd"
+                  d="M1937.115 0 L0 1938.0703 L0 0 Z" stroke-width="4.5288"
+                  node-name="Cellular Processes and Signaling"/>
+            <path clip-path="url(#clipPath2)" fill="none"
+                  node-id="Poorly Characterized" fill-rule="evenodd"
+                  d="M0 2224.2571 L0 1938.0703 L1937.115 0 L2227.1936 0 L2500 145.1821 L2500 2500 L146.5398 2500 Z"
+                  stroke-width="4.5288" node-name="Poorly Characterized"/>
+            <path clip-path="url(#clipPath2)" fill="none" node-id="root"
+                  fill-rule="evenodd" d="M0 0 L2500 0 L2500 2500 L0 2500 Z"
+                  stroke-width="12" node-name="root"/>
+        </g>
+        <g font-size="13.2802px" transform="translate(6,6)"
+           text-rendering="optimizeLegibility" image-rendering="optimizeSpeed"
+           color-rendering="optimizeSpeed" font-family="sans-serif"
+           color-interpolation="sRGB" font-weight="bold">
+            <text x="2367.7251" y="48.9773" clip-path="url(#clipPath2)"
+                  node-id="RNA Processing and Modification" stroke="none"
+                  node-name="RNA Processing and Modification"
+                  xml:space="preserve">RNA Processing</text><text x="2366.7251"
+                  y="47.9773" clip-path="url(#clipPath2)" fill="white"
+                  node-id="RNA Processing and Modification" stroke="none"
+                  node-name="RNA Processing and Modification"
+                  xml:space="preserve">RNA Processing</text><text x="2363.8569"
+                  y="62.2575" clip-path="url(#clipPath2)"
+                  node-id="RNA Processing and Modification" stroke="none"
+                  node-name="RNA Processing and Modification"
+                  xml:space="preserve">and Modification</text><text x="2362.8569"
+                  y="61.2575" clip-path="url(#clipPath2)" fill="white"
+                  node-id="RNA Processing and Modification" stroke="none"
+                  node-name="RNA Processing and Modification"
+                  xml:space="preserve">and Modification</text><text x="9.0861"
+                  font-size="11.3608px" y="2414.209" clip-path="url(#clipPath2)"
+                  node-id="Amino Acid Transport and Metabolism" stroke="none"
+                  node-name="Amino Acid Transport and Metabolism"
+                  xml:space="preserve">Amino Acid</text><text x="8.0861"
+                  font-size="11.3608px" y="2413.209" clip-path="url(#clipPath2)"
+                  fill="white" node-id="Amino Acid Transport and Metabolism"
+                  stroke="none" node-name="Amino Acid Transport and Metabolism"
+                  xml:space="preserve">Amino Acid</text><text x="13.6293"
+                  font-size="11.3608px" y="2425.5698"
+                  clip-path="url(#clipPath2)"
+                  node-id="Amino Acid Transport and Metabolism" stroke="none"
+                  node-name="Amino Acid Transport and Metabolism"
+                  xml:space="preserve">Transport</text><text x="12.6293"
+                  font-size="11.3608px" y="2424.5698"
+                  clip-path="url(#clipPath2)" fill="white"
+                  node-id="Amino Acid Transport and Metabolism" stroke="none"
+                  node-name="Amino Acid Transport and Metabolism"
+                  xml:space="preserve">Transport</text><text x="33.1058"
+                  font-size="11.3608px" y="2436.9307"
+                  clip-path="url(#clipPath2)"
+                  node-id="Amino Acid Transport and Metabolism" stroke="none"
+                  node-name="Amino Acid Transport and Metabolism"
+                  xml:space="preserve">and</text><text x="32.1058"
+                  font-size="11.3608px" y="2435.9307"
+                  clip-path="url(#clipPath2)" fill="white"
+                  node-id="Amino Acid Transport and Metabolism" stroke="none"
+                  node-name="Amino Acid Transport and Metabolism"
+                  xml:space="preserve">and</text><text x="7.8324"
+                  font-size="11.3608px" y="2448.2915"
+                  clip-path="url(#clipPath2)"
+                  node-id="Amino Acid Transport and Metabolism" stroke="none"
+                  node-name="Amino Acid Transport and Metabolism"
+                  xml:space="preserve">Metabolism</text><text x="6.8324"
+                  font-size="11.3608px" y="2447.2915"
+                  clip-path="url(#clipPath2)" fill="white"
+                  node-id="Amino Acid Transport and Metabolism" stroke="none"
+                  node-name="Amino Acid Transport and Metabolism"
+                  xml:space="preserve">Metabolism</text><text x="8.6017"
+                  font-size="2.5638px" y="2267.7917" clip-path="url(#clipPath2)"
+                  node-id="Inorganic Ion Transport and Metabolism" stroke="none"
+                  node-name="Inorganic Ion Transport and Metabolism"
+                  xml:space="preserve">Inorganic</text><text x="7.6017"
+                  font-size="2.5638px" y="2266.7917" clip-path="url(#clipPath2)"
+                  fill="white" node-id="Inorganic Ion Transport and Metabolism"
+                  stroke="none"
+                  node-name="Inorganic Ion Transport and Metabolism"
+                  xml:space="preserve">Inorganic</text><text x="13.1284"
+                  font-size="2.5638px" y="2270.3555" clip-path="url(#clipPath2)"
+                  node-id="Inorganic Ion Transport and Metabolism" stroke="none"
+                  node-name="Inorganic Ion Transport and Metabolism"
+                  xml:space="preserve">Ion</text><text x="12.1284"
+                  font-size="2.5638px" y="2269.3555" clip-path="url(#clipPath2)"
+                  fill="white" node-id="Inorganic Ion Transport and Metabolism"
+                  stroke="none"
+                  node-name="Inorganic Ion Transport and Metabolism"
+                  xml:space="preserve">Ion</text><text x="8.3082"
+                  font-size="2.5638px" y="2272.9192" clip-path="url(#clipPath2)"
+                  node-id="Inorganic Ion Transport and Metabolism" stroke="none"
+                  node-name="Inorganic Ion Transport and Metabolism"
+                  xml:space="preserve">Transport</text><text x="7.3082"
+                  font-size="2.5638px" y="2271.9192" clip-path="url(#clipPath2)"
+                  fill="white" node-id="Inorganic Ion Transport and Metabolism"
+                  stroke="none"
+                  node-name="Inorganic Ion Transport and Metabolism"
+                  xml:space="preserve">Transport</text><text x="12.7034"
+                  font-size="2.5638px" y="2275.4829" clip-path="url(#clipPath2)"
+                  node-id="Inorganic Ion Transport and Metabolism" stroke="none"
+                  node-name="Inorganic Ion Transport and Metabolism"
+                  xml:space="preserve">and</text><text x="11.7034"
+                  font-size="2.5638px" y="2274.4829" clip-path="url(#clipPath2)"
+                  fill="white" node-id="Inorganic Ion Transport and Metabolism"
+                  stroke="none"
+                  node-name="Inorganic Ion Transport and Metabolism"
+                  xml:space="preserve">and</text><text x="7"
+                  font-size="2.5638px" y="2278.0466" clip-path="url(#clipPath2)"
+                  node-id="Inorganic Ion Transport and Metabolism" stroke="none"
+                  node-name="Inorganic Ion Transport and Metabolism"
+                  xml:space="preserve">Metabolism</text><text x="6"
+                  font-size="2.5638px" y="2277.0466" clip-path="url(#clipPath2)"
+                  fill="white" node-id="Inorganic Ion Transport and Metabolism"
+                  stroke="none"
+                  node-name="Inorganic Ion Transport and Metabolism"
+                  xml:space="preserve">Metabolism</text><text x="149.0596"
+                  font-size="134.2524px" y="418.8668"
+                  clip-path="url(#clipPath2)"
+                  node-id="Cell Wall/Membrane/Envelope Biogenesis" stroke="none"
+                  node-name="Cell Wall/Membrane/Envelope Biogenesis"
+                  xml:space="preserve">Cell Wall/</text><text x="148.0596"
+                  font-size="134.2524px" y="417.8668"
+                  clip-path="url(#clipPath2)" fill="white"
+                  node-id="Cell Wall/Membrane/Envelope Biogenesis" stroke="none"
+                  node-name="Cell Wall/Membrane/Envelope Biogenesis"
+                  xml:space="preserve">Cell Wall/</text><text x="76.558"
+                  font-size="134.2524px" y="553.1192"
+                  clip-path="url(#clipPath2)"
+                  node-id="Cell Wall/Membrane/Envelope Biogenesis" stroke="none"
+                  node-name="Cell Wall/Membrane/Envelope Biogenesis"
+                  xml:space="preserve">Membrane/</text><text x="75.558"
+                  font-size="134.2524px" y="552.1192"
+                  clip-path="url(#clipPath2)" fill="white"
+                  node-id="Cell Wall/Membrane/Envelope Biogenesis" stroke="none"
+                  node-name="Cell Wall/Membrane/Envelope Biogenesis"
+                  xml:space="preserve">Membrane/</text><text x="157.4831"
+                  font-size="134.2524px" y="687.3716"
+                  clip-path="url(#clipPath2)"
+                  node-id="Cell Wall/Membrane/Envelope Biogenesis" stroke="none"
+                  node-name="Cell Wall/Membrane/Envelope Biogenesis"
+                  xml:space="preserve">Envelope</text><text x="156.4831"
+                  font-size="134.2524px" y="686.3716"
+                  clip-path="url(#clipPath2)" fill="white"
+                  node-id="Cell Wall/Membrane/Envelope Biogenesis" stroke="none"
+                  node-name="Cell Wall/Membrane/Envelope Biogenesis"
+                  xml:space="preserve">Envelope</text><text x="93.0118"
+                  font-size="134.2524px" y="821.624" clip-path="url(#clipPath2)"
+                  node-id="Cell Wall/Membrane/Envelope Biogenesis" stroke="none"
+                  node-name="Cell Wall/Membrane/Envelope Biogenesis"
+                  xml:space="preserve">Biogenesis</text><text x="92.0118"
+                  font-size="134.2524px" y="820.624" clip-path="url(#clipPath2)"
+                  fill="white" node-id="Cell Wall/Membrane/Envelope Biogenesis"
+                  stroke="none"
+                  node-name="Cell Wall/Membrane/Envelope Biogenesis"
+                  xml:space="preserve">Biogenesis</text><text x="1669.1488"
+                  font-size="13.071px" y="52.0041" clip-path="url(#clipPath2)"
+                  node-id="Post-Translational Modification, Protein Turnover and Chaperones"
+                  stroke="none"
+                  node-name="Post-Translational Modification, Protein Turnover and Chaperones"
+                  xml:space="preserve">Post-Translational</text><text x="1668.1488"
+                  font-size="13.071px" y="51.0041" clip-path="url(#clipPath2)"
+                  fill="white"
+                  node-id="Post-Translational Modification, Protein Turnover and Chaperones"
+                  stroke="none"
+                  node-name="Post-Translational Modification, Protein Turnover and Chaperones"
+                  xml:space="preserve">Post-Translational</text><text x="1659.0999"
+                  font-size="13.071px" y="65.0751" clip-path="url(#clipPath2)"
+                  node-id="Post-Translational Modification, Protein Turnover and Chaperones"
+                  stroke="none"
+                  node-name="Post-Translational Modification, Protein Turnover and Chaperones"
+                  xml:space="preserve">Modification, Protein</text><text x="1658.0999"
+                  font-size="13.071px" y="64.0751" clip-path="url(#clipPath2)"
+                  fill="white"
+                  node-id="Post-Translational Modification, Protein Turnover and Chaperones"
+                  stroke="none"
+                  node-name="Post-Translational Modification, Protein Turnover and Chaperones"
+                  xml:space="preserve">Modification, Protein</text><text x="1641.2548"
+                  font-size="13.071px" y="78.1461" clip-path="url(#clipPath2)"
+                  node-id="Post-Translational Modification, Protein Turnover and Chaperones"
+                  stroke="none"
+                  node-name="Post-Translational Modification, Protein Turnover and Chaperones"
+                  xml:space="preserve">Turnover and Chaperones</text><text x="1640.2548"
+                  font-size="13.071px" y="77.1461" clip-path="url(#clipPath2)"
+                  fill="white"
+                  node-id="Post-Translational Modification, Protein Turnover and Chaperones"
+                  stroke="none"
+                  node-name="Post-Translational Modification, Protein Turnover and Chaperones"
+                  xml:space="preserve">Turnover and Chaperones</text><text x="926.2637"
+                  font-size="283.7622px" y="1609.6337"
+                  clip-path="url(#clipPath2)" node-id="Function Unknown"
+                  stroke="none" node-name="Function Unknown"
+                  xml:space="preserve">Function</text><text x="925.2637"
+                  font-size="283.7622px" y="1608.6337"
+                  clip-path="url(#clipPath2)" fill="white"
+                  node-id="Function Unknown" stroke="none"
+                  node-name="Function Unknown" xml:space="preserve">Function</text><text x="883.1036"
+                  font-size="283.7622px" y="1893.3959"
+                  clip-path="url(#clipPath2)" node-id="Function Unknown"
+                  stroke="none" node-name="Function Unknown"
+                  xml:space="preserve">Unknown</text><text x="882.1036"
+                  font-size="283.7622px" y="1892.3959"
+                  clip-path="url(#clipPath2)" fill="white"
+                  node-id="Function Unknown" stroke="none"
+                  node-name="Function Unknown" xml:space="preserve">Unknown</text>
+        </g>
+    </g>
+</svg>

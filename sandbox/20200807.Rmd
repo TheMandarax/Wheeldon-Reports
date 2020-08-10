@@ -1,0 +1,1811 @@
+---
+title: "Rational Designs for Enhanced Bioproduction"
+author: "Troy R. Alva"
+date: "August 7, 2020"
+output: 
+  ioslides_presentation:
+    widescreen: true
+    css: ../oral_presentation.css
+bibliography: ../bibliography.bib
+---
+
+```{r options, message=FALSE, warning=FALSE, include=FALSE}
+
+## Use cache for faster subsequent processing
+knitr::opts_chunk$set(cache=TRUE)
+
+## Necessary libraries
+library(RiboProfiling)
+library(data.table)
+library(ggplot2)
+library(cowplot)
+library(magick)
+library(grImport)
+library(scales)
+library(stats)
+library(plotly)
+library(plyr)
+library(zoo)
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(kableExtra)
+library(DiagrammeR)
+library(widgetframe)
+
+source("../processing/Revised/riboProfiling.R")
+source("../processing/Revised/helperFunctions.R")
+
+# Necessary data sets
+load("../data/pichia.dt.RData")
+load("../data/yeast.dt.RData")
+load("../data/yeast_2.dt.RData")
+load("../data/m1.listPromoterCov.RData")
+load("../data/m1.matchLenDistr.dt.RData")
+load("../data/t.chx.rawCounts.RData")
+load("../data/counts.dt.RData")
+load("../data/homology.dt.RData")
+load("../data/mask.dt.RData")
+
+# Define colors
+assign("black", "#000000", envir = .GlobalEnv)
+assign("white", "#ffffff", envir = .GlobalEnv)
+assign("grey", "#d3d6d9", envir = .GlobalEnv)
+assign("orange", "#ff6666", envir = .GlobalEnv)
+assign("blue", "#4a708b", envir = .GlobalEnv)
+assign("lightblue1", "#809aad", envir = .GlobalEnv)
+assign("lightblue2", "#a4b7c5", envir = .GlobalEnv)
+assign("lightblue3", "#c8d4dc", envir = .GlobalEnv)
+assign("lightblue4", "#ecf0f3", envir = .GlobalEnv)
+assign("darkblue1", "#334e61", envir = .GlobalEnv)
+assign("darkblue2", "#253845", envir = .GlobalEnv)
+assign("darkblue3", "#162129", envir = .GlobalEnv)
+assign("darkblue4", "#070b0d", envir = .GlobalEnv)
+
+# Default theme
+paper_theme <- theme_light(base_size = 10) + 
+  theme(axis.text = element_text(size = rel(1.0), color = black),
+        title = element_text(face = "bold"),
+        axis.title = element_text(face = "bold"),
+        plot.margin = margin(7,7,7,7), 
+        panel.grid = element_blank())
+
+# Wide tessellation theme
+tess_top_theme <- theme_light(base_size = 10) + 
+  theme(axis.text = element_text(size = rel(1.0), color = black),
+        title = element_text(face = "bold"),
+        axis.title = element_text(face = "bold"),
+        plot.margin = margin(20,5,1,5),
+        panel.grid = element_blank(), panel.border=element_blank())
+
+# Narrow tessellation theme
+tess_bottom_theme <- theme_light(base_size = 10) + 
+  theme(axis.text = element_text(size = rel(1.0), color = black),
+        title = element_text(face = "bold"),
+        axis.title = element_text(face = "bold"),
+        plot.margin = margin(1,5,20,5), 
+        panel.grid = element_blank(), panel.border=element_blank())
+
+# Enrichment vs TPM theme (top)
+demands_top_theme <- paper_theme + theme(plot.margin = margin(7, 7, -5, 7),
+                      axis.text.x = element_blank(),
+                      panel.grid.major.x = element_line(size = rel(0.25), 
+                                                        color = grey, 
+                                                        linetype = "dashed"))
+# Enrichment vs TPM theme (bottom)
+demands_bottom_theme <- paper_theme + 
+  theme(plot.margin = margin(0, 7, 7, 7), 
+        panel.grid.major.x = element_line(size = rel(0.25),
+                                          color = grey, 
+                                          linetype = "dashed"))
+
+# Min reads to plot
+minimum <- 29
+
+# Options for dot plot figures
+dot.color = blue
+contrast.color = orange
+dot.size = 1
+dot.shape = 20
+line.size = 1
+
+# Sets annotation size in plots to 6 font equivalent
+annotation.size = 2.1166666666667
+
+# Set NA values to blank on knitr tables
+opts <- options(knitr.kable.NA = "")
+
+```
+
+```{r demandsMath, message=FALSE, warning=FALSE, include=FALSE}
+cotrans <- pichia.dt %>% 
+  filter(dl.loc != "Mitochondrion" & es.3 > 1) %>% 
+  group_by(subcategory) %>% 
+  summarise(genes = n(),
+            ribosomes = sum(t.chx.rpm, na.rm = TRUE),
+            chains = sum(t.chx.ctpm, na.rm = TRUE)) %>% 
+  arrange(-chains)
+
+cotrans.ids <- pichia.dt %>% filter(dl.loc != "Mitochondrion" & es.3 > 1) %>% 
+  pull(id)
+
+posttrans <- pichia.dt %>% 
+  filter(dl.loc != "Mitochondrion" & es.3 < 1 & sp.sp == TRUE &
+           !id %in% cotrans.ids) %>% 
+  group_by(subcategory) %>% 
+  summarise(genes = n(),
+            chains = sum(t.chx.ctpm, na.rm = TRUE),
+            ribosomes = sum(t.chx.rpm, na.rm = TRUE)) %>% 
+  arrange(-chains) 
+
+pp.er.mem <- pichia.dt[dl.loc != "Mitochondrion" & 
+                         (tc.tmd >= 2 | (sp.sp == FALSE & tc.tmd ==1))]
+pp.er.sec <- pichia.dt[dl.loc != "Mitochondrion" & sp.sp == TRUE & tc.tmd <= 1]
+
+pp.mem.post.ctpm <- na.omit(pp.er.mem[es.3 < 1, t.chx.ctpm])
+pp.sec.post.ctpm <- na.omit(pp.er.sec[es.3 < 1, t.chx.ctpm])
+pp.er.post.ctpm <- sum(pp.mem.post.ctpm) + sum(pp.sec.post.ctpm)
+
+pp.mem.co.ctpm <- na.omit(pp.er.mem[es.3 >= 1, t.chx.ctpm])
+pp.sec.co.ctpm <- na.omit(pp.er.sec[es.3 >= 1, t.chx.ctpm])
+pp.er.co.ctpm <- sum(pp.mem.co.ctpm) + sum(pp.sec.co.ctpm)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### A) Sacharomyces cerevisiae
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Establish cerevisiae data sets
+demands.sc.dt <- yeast.dt[dl.loc != "Mitochondrion" & 
+                               s.chx.scaledReads > minimum &
+                               m.chx.scaledReads > minimum & 
+                               t.chx.scaledReads > minimum, 
+                             .(id, gene, description, t.chx.ctpm, t.chx.rpm,
+                               es.chx.ms, sp.sp, tc.tm)]
+sc.sec.dt <- demands.sc.dt[sp.sp == TRUE & tc.tm <= 1]
+sc.mem.dt <- demands.sc.dt[tc.tm >= 2 | (sp.sp == FALSE & tc.tm ==1)]
+
+
+### LEFT | Demand on translocatory system by numbers of nascent chains
+
+# Establish NC data sets
+sum.sc.secNC <- copy(sc.sec.dt)
+setkey(sum.sc.secNC, es.chx.ms)
+sum.sc.secNC[, sum := cumsum(t.chx.ctpm)]
+sum.sc.secNC[, norm.sum := sum/max(sum) * 100]
+
+sum.sc.memNC <- copy(sc.mem.dt)
+setkey(sum.sc.memNC, es.chx.ms)
+sum.sc.memNC[, sum := cumsum(t.chx.ctpm)]
+sum.sc.memNC[, norm.sum := sum/max(sum) * 100]
+
+
+# Establish RNC data sets
+sum.sc.secRNC <- copy(sc.sec.dt)
+setkey(sum.sc.secRNC, es.chx.ms)
+sum.sc.secRNC[, sum := cumsum(t.chx.rpm)]
+sum.sc.secRNC[, norm.sum := sum/max(sum) * 100]
+
+sum.sc.memRNC <- copy(sc.mem.dt)
+setkey(sum.sc.memRNC, es.chx.ms)
+sum.sc.memRNC[, sum := cumsum(t.chx.rpm)]
+sum.sc.memRNC[, norm.sum := sum/max(sum) * 100]
+
+
+# Establish pichia data set
+demands.pp.dt <- pichia.dt[dl.loc != "Mitochondrion" & 
+                               s.chx.scaledReads > minimum &
+                               m.chx.scaledReads > minimum & 
+                               t.chx.scaledReads > minimum, 
+                             .(id, gene, description, t.chx.ctpm, t.chx.rpm,
+                               es.3, sp.sp, tc.tmd)]
+pp.sec.dt <- demands.pp.dt[sp.sp == TRUE & tc.tmd <= 1]
+pp.mem.dt <- demands.pp.dt[tc.tmd >= 2 | (sp.sp == FALSE & tc.tmd ==1)]
+
+### LEFT | Demand on translocatory system by numbers of nascent chains
+
+# Establish NC data sets
+sum.pp.secNC <- copy(pp.sec.dt)
+setkey(sum.pp.secNC, es.3)
+sum.pp.secNC[, sum := cumsum(t.chx.ctpm)]
+sum.pp.secNC[, norm.sum := sum/max(sum) * 100]
+
+sum.pp.memNC <- copy(pp.mem.dt)
+setkey(sum.pp.memNC, es.3)
+sum.pp.memNC[, sum := cumsum(t.chx.ctpm)]
+sum.pp.memNC[, norm.sum := sum/max(sum) * 100]
+
+
+# Establish RNC data sets
+sum.pp.secRNC <- copy(pp.sec.dt)
+setkey(sum.pp.secRNC, es.3)
+sum.pp.secRNC[, sum := cumsum(t.chx.rpm)]
+sum.pp.secRNC[, norm.sum := sum/max(sum) * 100]
+
+sum.pp.memRNC <- copy(pp.mem.dt)
+setkey(sum.pp.memRNC, es.3)
+sum.pp.memRNC[, sum := cumsum(t.chx.rpm)]
+sum.pp.memRNC[, norm.sum := sum/max(sum) * 100]
+
+spDif <- pichia.dt %>% 
+  filter(dl.loc != "Mitochondrion" & sp.sp == TRUE & tc.tmd <= 1) %>% 
+  select(id, gene, description, protein.l, t.chx.ctpm, es.3)
+```
+
+# BACKGROUND
+
+## Biologics are enormously useful technologies {.font50}
+
+![](../images/background/biologics.png){width=100%} 
+
+[@Sanchez-Garcia2016-rf]
+
+## Why fungi? {.columns-2 .font50}
+
+<div style="float: left; width: 100%;">
+![](../images/background/cho_v_fungi.png){width=100%}
+</div>
+
+<div style="float: right; width: 100%;">
+![](../images/background/cho_v_fungi_2.png){width=100%}
+</div>
+
+[@Love2017-qa]
+
+
+
+## Challenges limit bioproduction {.font50}
+
+<div class="centered">
+![](../images/background/bottlenecks.png){width=90%}
+</div>
+
+[@Wang2017-iq]
+
+
+## Secretion challenges: Translation {.font50}
+
+![](../images/challenges_secretion/synthesis.png){width=100%} [@Nelson2017-gh]
+
+
+## Secretion challenges: ER Trafficking {.font50}
+
+![](../images/challenges_secretion/targeting.png){width=100%} [@Reece2015-nj]
+
+
+## Secretion challenges: Folding {.font50}
+
+![](../images/challenges_secretion/folding.png){width=100%} [@Klaips2018-up]
+
+
+## Secretion challenges: Degradation {.font50}
+
+![](../images/challenges_secretion/erad.jpg){width=100%} [@Hampton2000-qp]
+
+# QUANTIFICATION FOR RATIONAL DESIGN
+
+## Approaches that improve bioproduction {.columns-2 .font50}
+
+<div style="float: left; width: 35%;">
+A. Engineer secretory system
+
+B. Designing signal peptides
+
+C. Depleting competing resources
+</div>
+
+<div style="float: right; width: 165%;">
+![](../images/current_methods/methods.svg){width=100%}
+
+[@Huang2018-ru; @Mori2015-er; @Kallehauge2017-nr]
+</div>
+
+
+## Using data science for rational bioproduction {.font50}
+
+<div class="centered">
+![](../images/modelling/rational_engineering.png){width=83%}
+</div>
+
+[@Dykstra2017-hl]
+
+
+## Quantifying demands {.font50}
+
+![](../images/design/expression_metrics.png){width=100%}
+
+
+## Ribo-Seq for quantification {.columns-2 .font50}
+
+<div style="float: left; width: 70%;" class="centered">
+
+![](../images/riboseq/riboseq.png){width=110%} [@noauthor_undated-fy; @McGlincy2017-lb]
+</div>
+
+<div style="float: right; width: 130%;" class="centered">
+![](../images/riboseq/procedure.jpg){width=90%}
+</div>
+
+
+## 
+### Separating translation events in the cytosol and ER
+
+![](../images/design/Experimental_Design_long.png){width=100%}
+
+
+## Data processing and alignment {.font50}
+
+![](../images/processing/processing.png){width=100%}
+[@Martin2011-lc; @noauthor_undated-oo; @Li2009-bd]
+
+
+## Resolution and counting codon reads {.font50}
+
+```{r psite, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.env="figure*", fig.align="center", fig.pos="ht!"}
+
+frag_reads <- ggplot(data = m1.matchLenDistr.dt, aes(x = matchSize, y = counts/1e6)) + 
+  geom_bar(stat = "identity", 
+           color = white, 
+           fill = blue,
+           na.rm = TRUE) + 
+  labs(title = "Fragments captured",
+       x = "Fragment Size (nt)", y = bquote(bold("Reads ("~10^6~")"))) +
+  scale_x_discrete(breaks= c(22, 30)) +
+  paper_theme
+
+fragpic <- ggdraw() + draw_image("../images/riboseq/fragment_length.png")
+
+fragments <- plot_grid(fragpic, frag_reads,
+                  nrow = 2,
+                  align = 'v')
+
+match_size <- as.character(
+  m1.matchLenDistr.dt[which(m1.matchLenDistr.dt$counts == max(m1.matchLenDistr.dt$counts))][[1]])
+
+obey(paste0(
+  "psite_offset <- plotSummarizedCov(m1.listPromoterCov)$`", match_size, "_match`@ggplot"
+))
+
+ribosome <- ggdraw() + draw_image("../images/riboseq/psite.png")
+
+psite <- plot_grid(ribosome, psite_offset,
+                  nrow = 2,
+                  align = 'v')
+
+translation <- plot_grid(fragments, psite,
+                      ncol = 2,
+                      align = "h",
+                      labels = c("A", "B"),
+                      label_size=20)
+
+translation
+```
+[@Lareau2014-vv]
+
+
+# EXPERIMENTAL CHALLENGES
+
+## Problem: Multimapping {.font50}
+
+![](../images/design/mapping.png){width=100%}
+[@Taggart_undated-rx]
+
+
+## Correcting biases and quantifying demand {.font50}
+
+```{r metagene, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.env="figure*", fig.align="center", fig.pos="ht!"}
+############################### Non normalizaed set ############################
+## Create nonorm.dt to represent expression before normalization
+nonorm.dt <- copy(counts.dt) %>% 
+  filter(mask == FALSE) %>% 
+  mutate(t.chx.rpm = t.chx.codonReads/sum(t.chx.codonReads) * 1e6) %>% 
+  group_by(gene) %>% 
+  mutate(t.chx.reads = sum(t.chx.codonReads),
+         t.chx.rpm = sum(t.chx.rpm)) %>% 
+  select(gene, theory.l, t.chx.reads, t.chx.rpm) %>% 
+  distinct() %>% 
+  na.omit() %>% 
+  ungroup() %>% 
+  mutate(t.chx.rpk = t.chx.reads/(theory.l/1e3)) %>% 
+  mutate(t.chx.tpm = t.chx.rpk / (sum(t.chx.rpk)/1e6))
+
+#################### Metagene analysis ##################
+
+## Assign NEW variable, rpc.100
+#  Reads per codon over the first 100 codons for each gene
+rpc <- counts.dt %>% 
+  filter(codon <= 100 & mask == FALSE) %>% 
+  group_by(gene) %>% 
+  mutate(rpc.100 = mean(t.chx.codonReads),
+         rpc.100 = na_if(rpc.100, 0))
+
+## Assign NEW variable, rpc.norm (Divide by rpc.100 to normalize codonReads)
+norm <- full_join(counts.dt, rpc) %>% 
+  filter(mask == FALSE) %>% 
+  group_by(gene) %>% 
+  fill(rpc.100) %>% 
+  replace_na(list(rpc.100 = 0)) %>% 
+  mutate(rpc.100 = na_if(rpc.100, 0),
+         norm.100 = t.chx.codonReads/rpc.100,
+         rpc.gene = mean(t.chx.codonReads)) %>% 
+  select(-id)
+
+## Assign NEW variable, meta
+#  Mean of codon reads normalized by reads per codon value of 1st 100 codons
+meta <- norm %>% 
+  filter(rpc.gene > 0.5 & rpc.100 > 0 & gene %in% nonorm.dt$gene) %>% 
+  group_by(codon) %>% 
+  mutate(meta = mean(norm.100, trim = 0.05, na.rm = TRUE)) %>% 
+  select(codon, meta) %>% 
+  distinct() %>% 
+  ungroup() %>% 
+  arrange(codon)
+
+meta.dt <- meta %>% 
+  full_join(meta %>% filter(codon > 0 & codon <= 100) %>% 
+              mutate(smoothed = rollapply(meta, 
+                                          width = 10,
+                                          FUN = mean, 
+                                          partial = TRUE))) %>% 
+  full_join(meta %>% filter(codon > 100 & codon <= 1000) %>% 
+              mutate(smoothed = rollapply(meta,
+                                          width = 100,
+                                          FUN = mean, 
+                                          partial = TRUE))) %>% 
+  full_join(meta %>% filter(codon > 1000) %>% 
+              mutate(smoothed = rollapply(meta,
+                                          width = 1000,
+                                          FUN = median, 
+                                          partial = TRUE))) %>% 
+  filter(!is.na(smoothed)) %>% 
+  mutate(smoothed = na_if(smoothed, 0)) %>% 
+  fill(smoothed)
+
+bias.meta <- ggdraw() +
+  draw_image(image = "../images/analysis/ribosome_bias.png") +
+  theme(plot.margin = margin(-5, 7, -5, 7))
+
+meta.raw <- meta.dt %>% filter(codon <= 3000)
+rawMin <- min(meta.raw$meta)
+rawMax <- max(meta.raw$meta)
+
+scatter.meta <- ggplot() +
+  geom_point(data = meta.raw,
+             aes(x = codon, y = meta),
+             color = lightblue2,
+             size = dot.size,
+             shape = dot.shape,
+             na.rm = TRUE) +
+  geom_line(data = meta.raw,
+             aes(x = codon, y = smoothed),
+             color = blue,
+             size = 1,
+             na.rm = TRUE) +
+  geom_ribbon(data = meta.raw %>% filter(codon >= 100 & codon <= 300),
+              aes(x = codon, ymin = rawMin, ymax = rawMax),
+              fill = orange,
+              alpha = 0.5,
+              na.rm = TRUE) +
+  geom_ribbon(data = meta.raw %>% filter(codon >= 2000 & codon <= 2200),
+              aes(x = codon, ymin = rawMin, ymax = rawMax),
+              fill = orange,
+              alpha = 0.5,
+              na.rm = TRUE) +
+  scale_y_continuous(breaks = c(0, 1)) +
+  labs(x = "Codon", y = "Scaled reads") +
+  theme(plot.margin = margin(0, 7, 7, 7)) + 
+  paper_theme
+
+meta.plot <- plot_grid(bias.meta, scatter.meta,
+                       ncol = 1,
+                       align = 'v',
+                       rel_heights = c(6, 10),
+                       greedy = FALSE,
+                       labels = c('A', ''),
+                       label_size = 10)
+
+############################# Scaled Data Set ##################################
+
+scaled.dt <- full_join(counts.dt %>% select(-id), meta.dt) %>% 
+  group_by(gene) %>% 
+  mutate(num = sum(smoothed)) %>% 
+  group_by(mask, add = TRUE) %>% 
+  mutate(den = sum(smoothed)) %>% 
+  filter(mask == FALSE) %>% 
+  mutate(rScaleFactor = num/den,
+         t.chx.rpm = t.chx.codonReads * rScaleFactor) %>% 
+  replace_na(list(t.chx.rpm = 0)) %>% 
+  ungroup() %>% 
+  mutate(t.chx.rpm = t.chx.rpm/sum(t.chx.rpm)*1e6,
+         t.chx.scaled = t.chx.codonReads/smoothed) %>% 
+  group_by(gene) %>% 
+  mutate(t.chx.rpm = sum(t.chx.rpm),
+         t.chx.scaledReads = sum(t.chx.scaled))
+
+t.chx.dt <- scaled.dt %>% 
+  select(gene, pseudo.l, theory.l, t.chx.rpm, t.chx.scaledReads) %>% 
+  distinct() %>% 
+  mutate(t.chx.rpk = t.chx.scaledReads/(pseudo.l/1e3)) %>% 
+  ungroup() %>% 
+  mutate(t.chx.ctpm = t.chx.rpk/(sum(t.chx.rpk)/1e6))
+
+######################### Metascale analysis #########################
+
+rpc.scaled <- scaled.dt %>% 
+  mutate(rpc.100 = NA,
+         norm.100 = NA) %>% 
+  filter(codon <= 100) %>% 
+  group_by(gene) %>% 
+  mutate(rpc.100 = mean(t.chx.scaled),
+         rpc.100 = na_if(rpc.100, 0))
+
+norm.scaled <- full_join(scaled.dt, rpc.scaled) %>% 
+  group_by(gene) %>% 
+  fill(rpc.100) %>% 
+  replace_na(list(rpc.100 = 0)) %>% 
+  mutate(rpc.100 = na_if(rpc.100, 0),
+         norm.100 = t.chx.scaled/rpc.100,
+         rpc.gene = mean(t.chx.scaled))
+
+meta.scaled <- norm.scaled %>% 
+  filter(rpc.gene > 0.5 & rpc.100 > 0 & gene %in% nonorm.dt$gene) %>% 
+  group_by(codon) %>% 
+  mutate(meta = mean(norm.100, trim = 0.05, na.rm = TRUE)) %>% 
+  select(codon, meta) %>% 
+  distinct() %>% 
+  ungroup() %>% 
+  arrange(codon)
+
+meta.scaled.dt <- meta.scaled %>% 
+  full_join(meta.scaled %>% filter(codon > 0 & codon <= 100) %>% 
+              mutate(smoothed = rollapply(meta, 
+                                          width = 10,
+                                          FUN = mean, 
+                                          partial = TRUE))) %>% 
+  full_join(meta.scaled %>% filter(codon > 100 & codon <= 1000) %>% 
+              mutate(smoothed = rollapply(meta,
+                                          width = 100,
+                                          FUN = mean, 
+                                          partial = TRUE))) %>% 
+  full_join(meta.scaled %>% filter(codon > 1000) %>% 
+              mutate(smoothed = rollapply(meta,
+                                          width = 1000,
+                                          FUN = median, 
+                                          partial = TRUE))) %>% 
+  filter(!is.na(smoothed)) %>% 
+  mutate(smoothed = na_if(smoothed, 0)) %>% 
+  fill(smoothed)
+
+bias.scaled <- ggdraw() +
+  draw_image(image = "../images/analysis/ribosome_scaled.png") +
+  labs(title = "After Normalization") +
+  theme(plot.margin = margin(-5, 7, -5, 7))
+
+meta.scaled.trunc <- meta.scaled.dt %>% filter(codon <= 3000)
+scaledMin <- min(meta.scaled.trunc$meta)
+scaledMax <- max(meta.scaled.trunc$meta)
+
+scatter.scaled <- ggplot() +
+  geom_point(data = meta.scaled.trunc,
+             aes(x = codon, y = meta),
+             color = lightblue2,
+             size = dot.size/2,
+             shape = dot.shape,
+             na.rm = TRUE) +
+  geom_line(data = meta.scaled.trunc,
+             aes(x = codon, y = smoothed),
+             color = blue,
+             size = 1,
+             na.rm = TRUE) +
+  geom_ribbon(data = meta.scaled.trunc %>% filter(codon >= 100 & codon <= 300),
+              aes(x = codon, ymin = scaledMin, ymax = scaledMax),
+              fill = orange,
+              alpha = 0.5,
+              na.rm = TRUE) +
+  geom_ribbon(data = meta.scaled.trunc %>% filter(codon >= 2000 & codon <= 2200),
+              aes(x = codon, ymin = scaledMin, ymax = scaledMax),
+              fill = orange,
+              alpha = 0.5,
+              na.rm = TRUE) +
+  scale_y_continuous(breaks = c(0, 1)) +
+  labs(x = "Codon", y = "Corrected, scaled reads") +
+  paper_theme + 
+  theme(plot.margin = margin(0, 7, 7, 7))
+
+scaled.plot <- plot_grid(bias.scaled, scatter.scaled,
+                       ncol = 1,
+                       align = 'v',
+                       rel_heights = c(6, 10),
+                       greedy = FALSE,
+                       labels = c('B', ''),
+                       label_size = 10)
+
+######################### Put together metagene ##############################
+
+metagene.plot <- plot_grid(meta.plot, scaled.plot,
+                      ncol = 1,
+                      align = 'v')
+
+######################### Long gene and short gene load ########################
+
+long.id <- "GS115_004401-T1"
+short.id <- "GS115_000691-T1"
+
+genes.dt <- pichia.dt[id == long.id | id == short.id]
+
+long.name <- as.character(pichia.dt[id == long.id, gene])
+long.gene <- counts.dt[id == pichia.dt[id == long.id, id]]
+long.gene <- merge(long.gene, meta.dt, by.x = "codon", by.y = "codon")
+long.gene[, scaled := t.chx.codonReads/smoothed]
+long.roll <- max(long.gene$codon) / 3
+long.gene[, roll.raw :=  rollapply(
+          t.chx.codonReads, long.roll, mean, partial = TRUE)]
+long.gene[, roll.scaled :=  rollapply(
+          scaled, long.roll, mean, partial = TRUE)]
+
+short.name <- as.character(pichia.dt[id == short.id, gene])
+short.gene <- counts.dt[id == pichia.dt[id == short.id, id]]
+short.gene <- merge(short.gene, meta.dt, by.x = "codon", by.y = "codon")
+short.gene[, scaled := t.chx.codonReads/smoothed]
+short.roll <- max(short.gene$codon) / 3
+short.gene[, roll.raw :=  rollapply(
+          t.chx.codonReads, short.roll, mean, partial = TRUE)]
+short.gene[, roll.scaled :=  rollapply(
+          scaled, short.roll, mean, partial = TRUE)]
+
+if (max(long.gene$roll.raw) > max(long.gene$roll.scaled)) {
+  yf.long <- max(long.gene$roll.raw)
+} else {yf.long <- max(long.gene$roll.scaled)}
+
+if (max(short.gene$roll.raw) > max(short.gene$roll.scaled)) {
+  yf.short <- max(short.gene$roll.raw)
+} else {yf.short <- max(short.gene$roll.scaled)}
+
+if (yf.short > yf.long) {yf <- yf.short} else {yf <- yf.long}
+
+xf <- max(long.gene$codon)
+yf <- round(yf, digits = -2) + 100
+
+######################### Comparisons and labels ##############################
+nonorm.dt <- as.data.table(nonorm.dt)
+t.chx.dt <- as.data.table(t.chx.dt)
+
+short.tpm <- nonorm.dt[gene == short.id, round(t.chx.tpm)]
+short.rpm <- nonorm.dt[gene == short.id, round(t.chx.rpm)]
+
+short.ctpm <- t.chx.dt[gene == short.id, round(t.chx.ctpm)]
+short.crpm <- t.chx.dt[gene == short.id, round(t.chx.rpm)]
+
+long.tpm <- nonorm.dt[gene == long.id, round(t.chx.tpm)]
+long.rpm <- nonorm.dt[gene == long.id, round(t.chx.rpm)]
+
+long.ctpm <- t.chx.dt[gene == long.id, round(t.chx.ctpm)]
+long.crpm <- t.chx.dt[gene == long.id, round(t.chx.rpm)]
+
+short.raw.label <- paste0("TPM = ", short.tpm, "\n",
+                          "RPM = ", short.rpm)
+
+short.raw.rel.label <- paste0("Rel TPM = ", percent(short.tpm/long.tpm), "\n",
+                              "Rel RPM = ", percent(short.rpm/long.rpm))
+
+short.scaled.label <- paste0("cTPM = ", short.ctpm, "\n",
+                             "cRPM = ", short.crpm)
+
+short.scaled.rel.label <- paste0("Rel cTPM = ", percent(short.ctpm/long.ctpm), "\n",
+                                 "Rel cRPM = ", percent(short.crpm/long.crpm))
+
+long.raw.label <- paste0("TPM = ", long.tpm, "\n",
+                         "RPM = ", long.rpm)
+
+long.scaled.label <- paste0("cTPM = ", long.ctpm, "\n",
+                            "cRPM = ", long.crpm)
+
+######################### Short gene plot ##############################
+
+short.raw.plot <- ggplot() +
+  geom_area(data = short.gene,
+            aes(x = codon, y = roll.raw),
+            fill = lightblue3,
+            alpha = 0.5,
+            size = 1) +
+  geom_line(data = short.gene,
+            aes(x = codon, y = roll.raw),
+            color = blue,
+            size = 1) +
+  geom_area(data = short.gene[mask == TRUE],
+            aes(x = codon, y = roll.raw),
+            color = orange,
+            fill = orange,
+            size = 1) +
+  geom_line(data = short.gene[mask == TRUE],
+            aes(x = codon, y = roll.raw),
+            color = orange,
+            size = 1) +
+  scale_x_continuous(breaks = c(0, max(short.gene$codon), xf),
+                     limits = c(0, xf)) +
+  scale_y_continuous(limits = c(0, round(yf))) +
+  annotate("text",
+           x = xf - xf/4,
+           y = yf - yf/10,
+           label = short.raw.label,
+           size = annotation.size,
+           color = blue) +
+  # annotate("text",
+  #          x = xf - max(short.gene$codon) - (xf - max(short.gene$codon))/10,
+  #          y = (yf - yf/10)/2,
+  #          label = short.raw.rel.label,
+  #          size = annotation.size * 8/6,
+  #          color = blue) +
+  labs(title = paste0("Short Gene (", short.name, ")"), x = "Codon", y = "Reads") +
+  paper_theme + 
+  theme(plot.margin = margin(7, 7, -10, 7))
+  
+short.scaled.plot <- ggplot() +
+  geom_area(data = short.gene,
+            aes(x = codon, y = roll.scaled),
+            fill = lightblue3,
+            alpha = 0.5,
+            size = 1) +
+  geom_line(data = short.gene,
+            aes(x = codon, y = roll.scaled),
+            color = blue,
+            size = 1) +
+  geom_area(data = short.gene[mask == TRUE],
+            aes(x = codon, y = roll.scaled),
+            color = orange,
+            fill = orange,
+            size = 1) +
+  geom_line(data = short.gene[mask == TRUE],
+            aes(x = codon, y = roll.scaled),
+            color = orange,
+            size = 1) +
+  scale_x_continuous(breaks = c(0, max(short.gene$codon), xf),
+                     limits = c(0, xf)) +
+  scale_y_continuous(limits = c(0, round(yf))) +
+  annotate("text",
+           x = xf - xf/4,
+           y = yf - yf/10,
+           label = short.scaled.label,
+           size = annotation.size,
+           color = blue) +
+  # annotate("text",
+  #          x = xf - max(short.gene$codon) - (xf - max(short.gene$codon))/10,
+  #          y = (yf - yf/10)/2,
+  #          label = short.scaled.rel.label,
+  #          size = annotation.size * 8/6,
+  #          color = blue) +
+  labs(x = "Codon", y = "Corrected reads") +
+  paper_theme +
+  theme(plot.margin = margin(-10, 7, 7, 7))
+
+short.plots <- plot_grid(short.raw.plot, short.scaled.plot,
+                         ncol = 1,
+                         align = 'h',
+                         labels = c('C', ''),
+                         label_size = 10)
+
+######################### Long gene plot ##############################
+
+long.raw.plot <- ggplot() +
+  geom_area(data = long.gene,
+            aes(x = codon, y = roll.raw),
+            fill = lightblue3,
+            alpha = 0.5,
+            size = 1) +
+  geom_line(data = long.gene,
+            aes(x = codon, y = roll.raw),
+            color = blue,
+            size = 1) +
+  geom_area(data = long.gene[mask == TRUE],
+            aes(x = codon, y = roll.raw),
+            color = orange,
+            fill = orange,
+            size = 1) +
+  geom_line(data = long.gene[mask == TRUE],
+            aes(x = codon, y = roll.raw),
+            color = orange,
+            size = 1) +
+  scale_x_continuous(breaks = c(0, max(short.gene$codon), xf),
+                     limits = c(0, xf)) +
+  scale_y_continuous(limits = c(0, round(yf))) +
+  annotate("text",
+           x = xf - xf/4,
+           y = yf - yf/10,
+           label = long.raw.label,
+           size = annotation.size,
+           color = blue) +
+  labs(title = paste0("Long Gene (", long.name, ")"), x = "Codon", y = "Reads") +
+  paper_theme + 
+  theme(plot.margin = margin(7, 7, -10, 7))
+
+long.scaled.plot <- ggplot() +
+  geom_area(data = long.gene,
+            aes(x = codon, y = roll.scaled),
+            fill = lightblue3,
+            alpha = 0.5,
+            size = 1) +
+  geom_line(data = long.gene,
+            aes(x = codon, y = roll.scaled),
+            color = blue,
+            size = 1) +
+  geom_area(data = long.gene[mask == TRUE],
+            aes(x = codon, y = roll.scaled),
+            color = orange,
+            fill = orange,
+            size = 1) +
+  geom_line(data = long.gene[mask == TRUE],
+            aes(x = codon, y = roll.scaled),
+            color = orange,
+            size = 1) +
+  scale_x_continuous(breaks = c(0, max(short.gene$codon), xf),
+                     limits = c(0, xf)) +
+  scale_y_continuous(limits = c(0, round(yf))) +
+  annotate("text",
+           x = xf - xf/4,
+           y = yf - yf/10,
+           label = long.scaled.label,
+           size = annotation.size,
+           color = blue) +
+  labs(x = "Codon", y = "Corrected reads") +
+  paper_theme + 
+  theme(plot.margin = margin(-10, 7, 7, 7))
+
+long.plots <- plot_grid(long.raw.plot,
+                        long.scaled.plot,
+                        ncol = 1,
+                        align = 'h')
+
+######################### Put together genes ##############################
+
+gene.plots <- plot_grid(short.plots, long.plots,
+                        ncol = 2,
+                        align = 'v')
+
+######################### Put together analysis ##############################
+
+analysis <- plot_grid(metagene.plot, gene.plots,
+                      ncol = 2,
+                      rel_widths = c(1, 2),
+                      align = 'v')
+
+analysis
+```
+
+
+## Problem: Annotations {.font70}
+
+![](../images/annotations/loveerrors.png){width=100%}
+
+<div class="centered">
+Example: Misannotated translational start site for TIF1
+</div>
+
+<style>
+.column-left{
+  float: left;
+  width: 33%;
+  text-align: left;
+}
+.column-right{
+  float: right;
+  width: 66%;
+  text-align: right;
+}
+</style>
+
+<div class="column-left">
+**Description**  
+ATP-dependent RNA helicase and translation initiation factor
+
+**Predicted Location**  
+Cytoplasm
+
+**Membrane Enriched?**  
+FALSE
+</div>
+
+<div class="column-right">
+<div class="centered"> 
+Incorrect annotation 
+![](../images/annotations/tif1_bad.png){width=80%}
+</div>
+</div>
+
+
+## Problem: Annotations{.font70}
+
+![](../images/annotations/loveerrors.png){width=100%}
+
+<div class="centered">
+Example: Misannotated translational start site for TIF1
+</div>
+
+<div class="column-left">
+**Description**  
+ATP-dependent RNA helicase and translation initiation factor
+
+**Predicted Location**  
+Cytoplasm
+
+**Membrane Enriched?**  
+FALSE
+</div>
+
+<div class="column-right">
+<div class="centered"> 
+Correct annotation 
+![](../images/annotations/tif1_good.png){width=80%}
+</div>
+</div>
+
+
+## Modifying annotations {.columns-2 .font50}
+<div style="float: left; width: 80%;" class="centered">
+![](../images/annotations/strandswitching.png){width=80%}
+![](../images/annotations/minion.png){width=50%}
+
+</div>
+
+<div style="float: right; width: 120%;" class="centered">
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+frameWidget(grViz("digraph  {
+      # node definitions with substituted label text
+      node [fontname = Helvetica, shape = oval,  style = filled, fillcolor=khaki]
+      tab1 [label = < <b>Ribo-seq</b>>]
+      tab2 [label = < <b>Long-read <br/> RNA-seq</b>>]
+      tab12 [label = < <b>Genome <br/> Sequence</b>>]
+      node [fontname = Helvetica, fontcolor = white, shape = box,  style = filled, fillcolor = steelblue4]
+      tab3 [label = '@@3']
+      tab4 [label = '@@4']
+      tab5 [label = '@@5']
+      tab6 [label = '@@6']
+      tab7 [label = '@@7']
+      tab8 [label = '@@8']
+      tab9 [label = '@@9']
+      tab10 [label = '@@10']
+      tab13 [label = '@@13']
+      tab14 [label = '@@14']
+      tab15 [label = '@@15']
+
+      node [fontname = Helvetica, shape = septagon,  style = filled, fillcolor=darkseagreen, fontsize = 20]
+      tab11 [label = <<b>Gene Model</b>>]
+
+
+
+      # edge definitions with the node IDs
+      tab1 -> tab13;
+      tab13 -> tab3;
+      tab2 -> tab14;
+      tab14 -> tab8;
+      tab3 -> tab4;
+      tab3 -> tab9;
+      tab8 -> tab9;
+      tab9 -> tab10;
+      tab10 -> tab5;
+      tab10 -> tab6;
+      tab5 -> tab7;
+      tab6 -> tab7;
+      tab4 -> tab7;
+      tab9 -> tab7;
+      tab10 -> tab7;
+      tab7 -> tab15;
+      tab12 -> tab13;
+      tab12 -> tab14;
+      tab15 -> tab11;
+      tab3 -> tab15;
+      tab8 -> tab15;
+      }
+
+      [1]: 'Ribo-Seq'
+      [2]: 'Long Read RNA-seq'
+      [3]: 'Stringtie'
+      [4]: 'TransDecoder - 40aa'
+      [5]: 'GlimmerHMM'
+      [6]: 'CodingQuarry'
+      [7]: 'EVM'
+      [8]: 'PinFish'
+      [9]: 'PASA'
+      [10]: 'TransDecoder - 100aa'
+      [11]: 'Gene Model'
+      [12]: 'Genome Sequence'
+      [13]: 'HiSat2'
+      [14]: 'Minimap2'
+      [15]: 'Funannotate Update'
+      ", width = 700))
+
+```
+</div>
+
+
+## Comparing annotations {.font50}
+
+```{r proteinComparison, echo=FALSE, message=FALSE, warning = FALSE, fig.env="figure*", fig.align="center", fig.pos="ht", fig.width=10}
+
+accession <- c("Current study", "GS115 ([PRJNA304976](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-016-3109-0))", "GS115 ([PRJEA37871](https://pubmed.ncbi.nlm.nih.gov/19465926/))", "CBS7435 ([PRJEA62483](https://pubmed.ncbi.nlm.nih.gov/21575661/))")
+
+proteins <- c(homology.dt %>% pull(CRG.n) %>% head(1) %>% comma(),
+              homology.dt %>% pull(GS115.PRJNA304976.n) %>% head(1) %>% comma(),
+              homology.dt %>% pull(GS115.PRJEA37871.n) %>% head(1) %>% comma(),
+              homology.dt %>% pull(CBS7435.PRJEA62483.n) %>% head(1) %>% comma())
+
+homologous <- c(NA, 
+                homology.dt %>% filter(!is.na(GS115.PRJNA304976.gene)) %>%
+                  nrow() %>% comma(),
+                homology.dt %>% filter(!is.na(GS115.PRJEA37871.gene)) %>%
+                  nrow() %>% comma(),
+                homology.dt %>% filter(!is.na(CBS7435.PRJEA62483.gene)) %>%
+                  nrow() %>% comma())
+
+length_dif <- c(NA, 
+                homology.dt %>% filter(GS115.PRJNA304976.l != CRG.l) %>%
+                  select(GS115.PRJNA304976.l, CRG.l) %>% na.omit() %>% nrow() %>% comma(),
+                homology.dt %>% filter(GS115.PRJEA37871.l != CRG.l) %>%
+                  select(GS115.PRJEA37871.l, CRG.l) %>% na.omit() %>% nrow() %>% comma(),
+                homology.dt %>% filter(CBS7435.PRJEA62483.l != CRG.l) %>%
+                  select(CBS7435.PRJEA62483.l, CRG.l) %>% na.omit() %>% nrow() %>% comma())
+
+
+
+protein_table <- data.frame(
+  "Annotation" = accession, 
+  "Total proteins" = proteins,
+  "Homologous proteins" = homologous,
+  "Sequence differences" = length_dif
+)
+
+kable(protein_table, format = "html",
+      col.names = c("Annotation [note]", "Total sequences", "Homologous sequences",
+                    "Sequence differences")) %>% 
+  kable_styling(full_width = FALSE,
+                font_size = 18) %>%
+  column_spec(1, width = "15em") %>% 
+  add_footnote("Parenthesis contains NCBI accession numbers",
+               notation = "symbol")
+
+```
+
+
+# QUANTIFYING DEMANDS
+
+## Biosynthetic demands by ontology
+
+```{r totalDemands, echo=FALSE, message=FALSE, fig.env="figure*", fig.align="center", fig.pos="ht"}
+
+subcategories <- pichia.dt %>% 
+  group_by(subcategory) %>% 
+  summarise(genes = n(),
+            chains = sum(t.chx.ctpm, na.rm = TRUE)) %>% 
+  arrange(-chains) %>% 
+  mutate(percentage = percent(round(chains/1e6, digits = 2))) %>% 
+  slice(1:10)
+
+total.function <- subcategories %>% pull(subcategory)
+total.percentage <- subcategories %>% pull(percentage)
+total.genes <- subcategories %>% pull(genes)
+
+predicted.secreted <- pichia.dt %>% 
+  filter(dl.loc != "Mitochondrion" & sp.sp == TRUE & tc.tmd <= 1) %>% 
+  summarise(genes = n(), 
+            percentage = percent(round(sum(t.chx.ctpm, na.rm = TRUE)/1e6,
+                                       digits = 2)))
+sec.percentage <- predicted.secreted %>% pull(percentage)
+sec.genes <- predicted.secreted %>% pull(genes)
+
+predicted.ss <- pichia.dt %>% 
+  filter(sp.sp == TRUE) %>% 
+  summarise(genes = n(), 
+            percentage = percent(round(sum(t.chx.ctpm, na.rm = TRUE)/1e6,
+                                       digits = 2)))
+ss.percentage <- predicted.ss %>% pull(percentage)
+ss.genes <- predicted.ss %>% pull(genes)
+
+predicted.tmd <- pichia.dt %>% 
+  filter((tc.tmd == 1 & sp.sp == F) | tc.tmd >= 2) %>% 
+  summarise(genes = n(),
+            percentage = percent(round(sum(t.chx.ctpm, na.rm = TRUE)/1e6,
+                                       digits = 2)))
+tmd.percentage <- predicted.tmd %>% pull(percentage)
+tmd.genes <- predicted.tmd %>% pull(genes)
+
+predicted.gpi <- pichia.dt %>% 
+  filter(gpi.gpi == TRUE) %>% 
+  summarise(genes = n(), 
+            percentage = percent(round(
+              sum(t.chx.ctpm, na.rm = TRUE)/
+                sum(pichia.dt[sp.sp == TRUE, t.chx.ctpm], na.rm = TRUE),
+              digits = 2)))
+gpi.percentage <- predicted.gpi%>% pull(percentage)
+gpi.genes <- predicted.gpi %>% pull(genes)
+
+total_table <- data.frame(
+  " " = c(total.function, "Signal Sequences", "GPI Anchors", 
+          "Transmembrane Domains"), 
+  "total.percentage" = c(total.percentage, ss.percentage, 
+                         paste0(gpi.percentage, "[note]"), tmd.percentage),
+  "total.genes" = c(total.genes, ss.genes, gpi.genes, tmd.genes)
+)
+
+kable(total_table, format = "html",
+      col.names = c("", "Nascent chains (%)", "Genes (n)")) %>% 
+  kable_styling(font_size = 14) %>% 
+  pack_rows("Ontological Functions", 1, 10) %>% 
+  add_indent(12) %>% 
+  pack_rows("Predicted Features", 11, 13) %>% 
+  add_footnote( "Percentage of signal sequences that contain GPI anchors",
+               notation = "symbol")
+```
+
+
+## Translation in the cytosol and membranes {.font50}
+
+```{r enrichment, echo=FALSE, message=FALSE, warning=FALSE, fig.align="left", fig.pos="ht", fig.width=10, fig.height=5}
+memVsol.dt <- pichia.dt[m.chx.scaledReads > minimum & 
+                            s.chx.scaledReads > minimum, 
+                          .(id, gene, membrane=m.chx.ctpm, dl.loc, soluble=s.chx.ctpm, enrichment=es.chx.ms)]
+
+if (max(log(memVsol.dt$soluble)) > max(log(memVsol.dt$membrane))) {
+  bigVal <- max(log(memVsol.dt$soluble))
+} else {bigVal <- max(log(memVsol.dt$membrane))}
+if (min(log(memVsol.dt$soluble)) < min(log(memVsol.dt$membrane))) {
+  smallVal <- min(log(memVsol.dt$soluble))
+} else {smallVal <- min(log(memVsol.dt$membrane))}
+
+scatter.memVsol <- ggplot(data = memVsol.dt) +
+  geom_point(aes(x = log(soluble), y = log(membrane), text1=enrichment, text2=gene, text3=dl.loc),
+             color = dot.color, 
+             size = 0.7, 
+             shape = dot.shape,
+             na.rm = TRUE) +
+  labs(x = "Soluble log expression",
+       y = "Membrane log expression") +
+  geom_abline(slope = 1, 
+              intercept = 0, 
+              size = 2,
+              alpha = 0.5, 
+              color = lightblue3) +
+    geom_abline(slope = 1, 
+              intercept = 1, 
+              size = 2,
+              alpha = 0.25, 
+              color = contrast.color) +
+  scale_x_continuous(limits = c(smallVal, bigVal)) +
+  scale_y_continuous(limits = c(smallVal, bigVal)) +
+  paper_theme
+
+ggplotly(scatter.memVsol)
+```
+
+## Comparing demands in *K. phaffii*
+
+```{r pp-tessellations, echo=FALSE, fig.height=6, message=FALSE, warning=FALSE, fig.env="figure*", fig.align="center", fig.pos="ht!"}
+
+one_pic <- ggdraw() + draw_image("../images/tessellations/pp_chx_t/pp_chx_t.png")
+one_wide <- ggdraw() + draw_image("../images/tessellations/pp_chx_t/images/wide.png") + tess_top_theme
+one_zoom <- ggdraw() + draw_image("../images/tessellations/pp_chx_t/images/zoom.png") + tess_bottom_theme
+
+two_pic <- ggdraw() + draw_image("../images/tessellations/pp_enriched/pp_enriched.png")
+two_wide <- ggdraw() + draw_image("../images/tessellations/pp_enriched/images/wide.png") + tess_top_theme
+two_zoom <- ggdraw() + draw_image("../images/tessellations/pp_enriched/images/zoom.png") + tess_bottom_theme
+
+three_pic <- ggdraw() + draw_image("../images/tessellations/pp_er_cotrans/pp_er_cotrans.png")
+three_wide <- ggdraw() + draw_image("../images/tessellations/pp_er_cotrans/images/wide.png") + tess_top_theme
+three_zoom <- ggdraw() + draw_image("../images/tessellations/pp_er_cotrans/images/zoom.png") + tess_bottom_theme
+
+four_pic <- ggdraw() + draw_image("../images/tessellations/pp_er_posttrans/pp_er_posttrans.png")
+four_wide <- ggdraw() + draw_image("../images/tessellations/pp_er_posttrans/images/wide.png") + tess_top_theme
+four_zoom <- ggdraw() + draw_image("../images/tessellations/pp_er_posttrans/images/zoom.png") + tess_bottom_theme
+
+one_tess <- plot_grid(one_pic, one_wide, one_zoom, rel_heights = c(1, 4, 4), labels = c('A'), label_size = 15, ncol = 1, align = 'v')
+two_tess <- plot_grid(two_pic, two_wide, two_zoom, rel_heights = c(1, 4, 4), labels = c('B'), label_size = 15, ncol = 1, align = 'v')
+three_tess <- plot_grid(three_pic, three_wide, three_zoom, rel_heights = c(1, 4, 4), labels = c('C'), label_size = 15, ncol = 1, align = 'v')
+four_tess <- plot_grid(four_pic, four_wide, four_zoom, rel_heights = c(1, 4, 4), labels = c('D'), label_size = 15, ncol = 1, align = 'v')
+
+pp.tessellations <- plot_grid(one_tess, two_tess, three_tess, four_tess, ncol = 4, align='h')
+
+pp.tessellations
+```
+
+
+## ER demands by ontology
+
+```{r erDemands, echo=FALSE, message=FALSE, fig.env="figure*", fig.align="center", fig.pos="ht"}
+cotrans <- pichia.dt %>% 
+  filter(dl.loc != "Mitochondrion" & es.3 > 1) %>% 
+  group_by(subcategory) %>% 
+  summarise(genes = n(),
+            ribosomes = sum(t.chx.rpm, na.rm = TRUE),
+            chains = sum(t.chx.ctpm, na.rm = TRUE)) %>% 
+  arrange(-chains)
+
+cotrans.ids <- pichia.dt %>% filter(dl.loc != "Mitochondrion" & es.3 > 1) %>% 
+  pull(id)
+
+posttrans <- pichia.dt %>% 
+  filter(dl.loc != "Mitochondrion" & es.3 < 1 & sp.sp == TRUE &
+           !id %in% cotrans.ids) %>% 
+  group_by(subcategory) %>% 
+  summarise(genes = n(),
+            chains = sum(t.chx.ctpm, na.rm = TRUE),
+            ribosomes = sum(t.chx.rpm, na.rm = TRUE)) %>% 
+  arrange(-chains) 
+  
+
+ cotransPerc <- cotrans %>% 
+  mutate(chainPerc = percent(round(
+    chains/sum(sum(cotrans$chains) + sum(posttrans$chains)), digits = 3)),
+    riboPerc = percent(round(
+    ribosomes/sum(sum(cotrans$ribosomes) + sum(posttrans$ribosomes)), digits = 3))) %>% 
+   slice(1:7)
+    
+
+ posttransPerc <- posttrans %>% 
+  mutate(chainPerc = percent(round(
+    chains/sum(sum(cotrans$chains) + sum(posttrans$chains)), digits = 3)),
+    riboPerc = percent(round(
+    ribosomes/sum(sum(cotrans$ribosomes) + sum(posttrans$ribosomes)), digits = 3))) %>% 
+   slice(1:3)
+
+cotrans.function <- cotransPerc %>% pull(subcategory)
+cotrans.chains <- cotransPerc %>% pull(chainPerc)
+cotrans.ribosomes <- cotransPerc %>% pull(riboPerc)
+cotrans.genes <- cotransPerc %>% pull(genes)
+cotrans.total <- cotransPerc %>% pull(chains) %>% sum(na.rm = TRUE)
+
+posttrans.total <- posttransPerc %>% pull(chains) %>% sum(na.rm = TRUE)
+posttrans.function <- posttransPerc %>% pull(subcategory)
+posttrans.chains <- posttransPerc %>% pull(chainPerc)
+posttrans.genes <- posttransPerc %>% pull(genes)
+posttrans.ribosomes <- posttransPerc %>% pull(riboPerc)
+
+ER_table <- data.frame(
+  "function" = c(cotrans.function, posttrans.function),
+  "genes" = c(cotrans.genes, posttrans.genes),
+  "chains" = c(cotrans.chains, posttrans.chains),
+  "ribosomes" = c(cotrans.ribosomes, posttrans.ribosomes)
+)
+
+kable(ER_table, format = "html",
+      linesep = "",
+      col.names = c(" ", "Genes (n)", "Nascent chains (%)", "Ribosomes (%)")) %>% 
+  kable_styling(font_size = 14) %>% 
+  pack_rows("Cotranslationally Targeted", 1, 7) %>% 
+  pack_rows("Posttranslationally Targeted", 8, 10)
+```
+
+
+## Comparison of nascent chains produced
+
+```{r nascentDemands, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10}
+# This figure plots enrichment score against TPM. It is meant to indicate how
+# many nascent chains will be entering endoplasmic reticulum. Visually, it shows
+# that posttranslational targeting imposes a huge demand, but is restricted to
+# only a handful of proteins.
+
+# Specify colors for secreted and membrane proteins
+col.sec <- contrast.color
+col.mem <- dot.color
+
+# Get name of top genes for S. cerevisiae
+sc.mem.ctpm.gene <- sc.mem.dt %>%
+  arrange(-t.chx.ctpm) %>% pull(gene) %>% head(1)
+
+sc.sec.ctpm.gene <- sc.sec.dt %>%
+  arrange(-t.chx.ctpm) %>% pull(gene) %>% head(1)
+
+sc.mem.rpm.gene <- sc.mem.dt %>%
+  arrange(-t.chx.rpm) %>% pull(gene) %>% head(1)
+
+sc.sec.rpm.gene <- sc.sec.dt %>%
+  arrange(-t.chx.rpm) %>% pull(gene) %>% head(1)
+
+# Top scatter plot for NC
+scatter.scNC <- ggplot() +
+  geom_point(data = sc.mem.dt,
+             aes(x = es.chx.ms, y = t.chx.ctpm),
+             size = dot.size, color = col.mem,
+             na.rm = TRUE) +
+  geom_segment(data = sc.mem.dt,
+               aes(x = es.chx.ms, y = t.chx.ctpm, xend = es.chx.ms, yend = 0),
+               size = dot.size, color = col.mem,
+               na.rm = TRUE) +
+  annotate("text",
+           x = sc.mem.dt[gene == sc.mem.ctpm.gene, es.chx.ms] + .4,
+           y = sc.mem.dt[gene == sc.mem.ctpm.gene, t.chx.ctpm] +1000,
+           label = sc.mem.ctpm.gene,
+           color = col.mem,
+           size = annotation.size) +
+  geom_point(data = sc.sec.dt,
+             aes(x = es.chx.ms, y = t.chx.ctpm),
+             size = dot.size, color = col.sec,
+             na.rm = TRUE) +
+  geom_segment(data = sc.sec.dt,
+               aes(x = es.chx.ms, y = t.chx.ctpm, xend = es.chx.ms, yend = 0),
+               size = dot.size, color = col.sec,
+               na.rm = TRUE) +
+  annotate("text",
+           x = sc.sec.dt[gene == sc.sec.ctpm.gene, es.chx.ms] +.5,
+           y = sc.sec.dt[gene == sc.sec.ctpm.gene, t.chx.ctpm],
+           label = sc.sec.ctpm.gene,
+           color = col.sec,
+           size = annotation.size) +
+  labs(title = expression(bold(paste(
+    bolditalic("S. cerevisiae"), " nascent chains"))),
+       x = "", y = "cTPM") +
+  scale_y_continuous(label = scientific_format()) +
+  demands_top_theme
+
+# Sum line plot for NC
+line.scNC <- ggplot() +
+  geom_line(data = sum.sc.memNC,
+            aes(x = es.chx.ms, y = norm.sum),
+            col = col.mem, size = line.size,
+            na.rm = TRUE) +
+  geom_line(data = sum.sc.secNC,
+            aes(x = es.chx.ms, y = norm.sum),
+            color = col.sec, size = line.size,
+            na.rm = TRUE) +
+  labs(x = "Enrichment score",
+       y = "cum.%") +
+  scale_x_continuous(breaks = seq(from = round(min(sum.sc.memNC$es.chx.ms)),
+                                  to = round(max(sum.sc.memNC$es.chx.ms)), 
+                                  by = 2)) +
+  demands_bottom_theme
+
+# Put NC together
+sc.nc <- plot_grid(scatter.scNC, line.scNC,
+                   rel_heights = c(1.8, 1),
+                   nrow = 2,
+                   labels = c("", ""),
+                   label_size = 10,
+                   align = 'v')
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### B) Pichia pastoris
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Get name of top genes for S. cerevisiae
+pp.mem.ctpm.gene <- pp.mem.dt %>%
+  arrange(-t.chx.ctpm) %>% pull(gene) %>% head(1)
+
+pp.sec.ctpm.gene <- pp.sec.dt %>%
+  arrange(-t.chx.ctpm) %>% pull(gene) %>% head(1)
+
+pp.mem.rpm.gene <- pp.mem.dt %>%
+  arrange(-t.chx.rpm) %>% pull(gene) %>% head(1)
+
+pp.sec.rpm.gene <- pp.sec.dt %>%
+  arrange(-t.chx.rpm) %>% pull(gene) %>% head(1)
+
+pp.sec.ctpm.es.gene <- pp.sec.dt %>% 
+  filter(es.3 > 3) %>% arrange(-t.chx.ctpm) %>% pull(gene) %>% head(1)
+
+pp.sec.rpm.es.gene <- pp.sec.dt %>% 
+  filter(es.3 > 3) %>% arrange(-t.chx.rpm) %>% pull(gene) %>% head(1)
+
+# Top scatter plot for NC
+scatter.ppNC <- ggplot() +
+  geom_point(data = pp.mem.dt,
+             aes(x = es.3, y = t.chx.ctpm),
+             size = dot.size, color = col.mem,
+             na.rm = TRUE) +
+  geom_segment(data = pp.mem.dt,
+               aes(x = es.3, y = t.chx.ctpm, xend = es.3, yend = 0),
+               size = dot.size, color = col.mem,
+               na.rm = TRUE) +
+  annotate("text",
+           x = pp.mem.dt[gene == pp.mem.ctpm.gene, es.3] + .4,
+           y = pp.mem.dt[gene == pp.mem.ctpm.gene, t.chx.ctpm] + 600,
+           label = pp.mem.ctpm.gene,
+           color = col.mem,
+           size = annotation.size) +
+  geom_point(data = pp.sec.dt,
+             aes(x = es.3, y = t.chx.ctpm),
+             size = dot.size, color = col.sec,
+             na.rm = TRUE) +
+  geom_segment(data = pp.sec.dt,
+               aes(x = es.3, y = t.chx.ctpm, xend = es.3, yend = 0),
+               size = dot.size, color = col.sec,
+               na.rm = TRUE) +
+  annotate("text",
+           x = pp.sec.dt[gene == pp.sec.ctpm.gene, es.3] + 0.8,
+           y = pp.sec.dt[gene == pp.sec.ctpm.gene, t.chx.ctpm],
+           label = pp.sec.ctpm.gene,
+           color = col.sec,
+           size = annotation.size) +
+  annotate("text",
+           x = pp.sec.dt[gene == pp.sec.ctpm.es.gene, es.3] - .4,
+           y = pp.sec.dt[gene == pp.sec.ctpm.es.gene, t.chx.ctpm] + 600,
+           label = pp.sec.ctpm.es.gene,
+           color = col.sec,
+           size = annotation.size) +
+  labs(title = expression(bold(
+    paste(bolditalic("K. phaffii"), " nascent chains"))),
+       x = "", y = "cTPM") +
+  scale_y_continuous(label = scientific_format()) +
+  demands_top_theme
+
+# Sum line plot for NC
+line.ppNC <- ggplot() +
+  geom_line(data = sum.pp.memNC,
+            aes(x = es.3, y = norm.sum),
+            col = col.mem, size = line.size, na.rm = TRUE) +
+  geom_line(data = sum.pp.secNC,
+            aes(x = es.3, y = norm.sum),
+            color = col.sec, size = line.size, na.rm = TRUE) +
+  labs(x = "Enrichment score",
+       y = "cum.%") +
+  scale_x_continuous(breaks = seq(from = round(min(sum.pp.memNC$es.3)),
+                                  to = round(max(sum.pp.memNC$es.3)), 
+                                  by = 2)) +
+  demands_bottom_theme
+
+# Put NC together
+pp.nc <- plot_grid(scatter.ppNC, line.ppNC,
+                   rel_heights = c(1.8, 1),
+                   nrow = 2,
+                   align = 'v',
+                   labels = c("", ""),
+                   label_size = 10)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Put all plots together
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+demands <- plot_grid(sc.nc, pp.nc,
+                     align='v',
+                     ncol =2)
+
+demands
+```
+
+## Comparison of ribosomes used
+
+```{r ribosomeDemands, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10}
+# This figure plots enrichment score against TPM. It is meant to indicate how
+# many nascent chains will be entering endoplasmic reticulum. Visually, it shows
+# that posttranslational targeting imposes a huge demand, but is restricted to
+# only a handful of proteins.
+
+# Specify colors for secreted and membrane proteins
+col.sec <- contrast.color
+col.mem <- dot.color
+
+# Get name of top genes for S. cerevisiae
+sc.mem.ctpm.gene <- sc.mem.dt %>%
+  arrange(-t.chx.ctpm) %>% pull(gene) %>% head(1)
+
+sc.sec.ctpm.gene <- sc.sec.dt %>%
+  arrange(-t.chx.ctpm) %>% pull(gene) %>% head(1)
+
+sc.mem.rpm.gene <- sc.mem.dt %>%
+  arrange(-t.chx.rpm) %>% pull(gene) %>% head(1)
+
+sc.sec.rpm.gene <- sc.sec.dt %>%
+  arrange(-t.chx.rpm) %>% pull(gene) %>% head(1)
+
+### RIGHT | Demand on biogeneis system by ribosome nascent chain complexes
+
+# Top scatter plot for RNC
+scatter.scRNC <- ggplot() +
+  geom_point(data = sc.mem.dt,
+             aes(x = es.chx.ms, y = t.chx.rpm),
+             size = dot.size, color = col.mem,
+             na.rm = TRUE) +
+  geom_segment(data = sc.mem.dt,
+               aes(x = es.chx.ms, y = t.chx.rpm,
+                   xend = es.chx.ms, yend = 0),
+               size = dot.size, color = col.mem,
+               na.rm = TRUE) +
+  annotate("text",
+           x = sc.mem.dt[gene == sc.mem.rpm.gene, es.chx.ms] + .4,
+           y = sc.mem.dt[gene == sc.mem.rpm.gene, t.chx.rpm] + 600,
+           label = sc.mem.rpm.gene,
+           color = col.mem,
+           size = annotation.size) +
+  geom_point(data = sc.sec.dt,
+             aes(x = es.chx.ms, y = t.chx.rpm),
+             size = dot.size, color = col.sec,
+             na.rm = TRUE) +
+  geom_segment(data = sc.sec.dt,
+               aes(x = es.chx.ms, y = t.chx.rpm,
+                   xend = es.chx.ms, yend = 0),
+               size = dot.size, color = col.sec,
+               na.rm = TRUE) +
+  annotate("text",
+           x = sc.sec.dt[gene == sc.sec.rpm.gene, es.chx.ms] + .55,
+           y = sc.sec.dt[gene == sc.sec.rpm.gene, t.chx.rpm],
+           label = sc.sec.rpm.gene,
+           color = col.sec,
+           size = annotation.size) +
+  labs(title = expression(bold(paste(
+    bolditalic("S. cerevisiae"), " ribosome demand"))),
+       x = "", y = "cRPM") +
+  scale_y_continuous(label = scientific_format()) +
+  demands_top_theme
+
+# Sum line plot for RNC
+line.scRNC <- ggplot() +
+  geom_line(data = sum.sc.memRNC,
+            aes(x = es.chx.ms, y = norm.sum),
+            col = col.mem, size = line.size,
+            na.rm = TRUE) +
+  geom_line(data = sum.sc.secRNC,
+            aes(x = es.chx.ms, y = norm.sum),
+            color = col.sec, size = line.size,
+            na.rm = TRUE) +
+  labs(x = "Enrichment score",
+       y = "cum.%") +
+  scale_x_continuous(breaks = seq(from = round(min(sum.sc.memRNC$es.chx.ms)),
+                                  to = round(max(sum.sc.memRNC$es.chx.ms)), 
+                                  by = 2)) +
+  demands_bottom_theme
+
+# Put RNC together
+sc.rnc <- plot_grid(scatter.scRNC, line.scRNC,
+                   rel_heights = c(1.8, 1),
+                   nrow = 2,
+                   align = 'v')
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### B) Pichia pastoris
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Get name of top genes for S. cerevisiae
+pp.mem.ctpm.gene <- pp.mem.dt %>%
+  arrange(-t.chx.ctpm) %>% pull(gene) %>% head(1)
+
+pp.sec.ctpm.gene <- pp.sec.dt %>%
+  arrange(-t.chx.ctpm) %>% pull(gene) %>% head(1)
+
+pp.mem.rpm.gene <- pp.mem.dt %>%
+  arrange(-t.chx.rpm) %>% pull(gene) %>% head(1)
+
+pp.sec.rpm.gene <- pp.sec.dt %>%
+  arrange(-t.chx.rpm) %>% pull(gene) %>% head(1)
+
+pp.sec.ctpm.es.gene <- pp.sec.dt %>% 
+  filter(es.3 > 3) %>% arrange(-t.chx.ctpm) %>% pull(gene) %>% head(1)
+
+pp.sec.rpm.es.gene <- pp.sec.dt %>% 
+  filter(es.3 > 3) %>% arrange(-t.chx.rpm) %>% pull(gene) %>% head(1)
+
+### RIGHT | Demand on biogeneis system by ribosome nascent chain complexes
+
+
+# Top scatter plot for RNC
+scatter.ppRNC <- ggplot() +
+  geom_point(data = pp.mem.dt,
+             aes(x = es.3, y = t.chx.rpm),
+             size = dot.size, color = col.mem, na.rm = TRUE) +
+  geom_segment(data = pp.mem.dt,
+               aes(x = es.3, y = t.chx.rpm,
+                   xend = es.3, yend = 0),
+               size = dot.size, color = col.mem, na.rm = TRUE) +
+  annotate("text",
+           x = pp.mem.dt[gene == pp.mem.rpm.gene, es.3] + .4,
+           y = pp.mem.dt[gene == pp.mem.rpm.gene, t.chx.rpm] + 250,
+           label = pp.mem.rpm.gene,
+           color = col.mem,
+           size = annotation.size) +
+  geom_point(data = pp.sec.dt,
+             aes(x = es.3, y = t.chx.rpm),
+             size = dot.size, color = col.sec, na.rm = TRUE) +
+  geom_segment(data = pp.sec.dt,
+               aes(x = es.3, y = t.chx.rpm,
+                   xend = es.3, yend = 0),
+               size = dot.size, color = col.sec, na.rm = TRUE) +
+  annotate("text",
+           x = pp.sec.dt[gene == pp.sec.rpm.gene, es.3] + .4,
+           y = pp.sec.dt[gene == pp.sec.rpm.gene, t.chx.rpm],
+           label = pp.sec.rpm.gene,
+           color = col.sec,
+           size = annotation.size) +
+  annotate("text",
+           x = pp.sec.dt[gene == pp.sec.rpm.es.gene, es.3] - .5,
+           y = pp.sec.dt[gene == pp.sec.rpm.es.gene, t.chx.rpm],
+           label = pp.sec.rpm.es.gene,
+           color = col.sec,
+           size = annotation.size) +
+  labs(title = expression(bold(paste(
+    bolditalic("K. phaffii"), " ribosome demand"))),
+       x = "", y = "cRPM") +
+  scale_y_continuous(label = scientific_format()) +
+  demands_top_theme
+
+# Sum line plot for RNC
+line.ppRNC <- ggplot() +
+  geom_line(data = sum.pp.memRNC,
+            aes(x = es.3, y = norm.sum),
+            col = col.mem, size = line.size, na.rm = TRUE) +
+  geom_line(data = sum.pp.secRNC,
+            aes(x = es.3, y = norm.sum),
+            color = col.sec, size = line.size, na.rm = TRUE) +
+  labs(x = "Enrichment score",
+       y = "cum.%") +
+  scale_x_continuous(breaks = seq(from = round(min(sum.pp.memRNC$es.3)),
+                                  to = round(max(sum.pp.memRNC$es.3)), 
+                                  by = 2)) +
+  demands_bottom_theme
+
+# Put RNC together
+pp.rnc <- plot_grid(scatter.ppRNC, line.ppRNC,
+                   rel_heights = c(1.8, 1),
+                   nrow = 2,
+                   align = 'v')
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Put all plots together
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+demands <- plot_grid(sc.rnc, pp.rnc,
+                     align='v',
+                     ncol =2)
+
+demands
+```
+
+
+## Possible targets for *K. phaffii* {.columns-2}
+
+<div style="float: left; width: 100%;" class="centered">
+```{r kpCoTargets, echo=FALSE, message=FALSE, warning=FALSE}
+library(kableExtra)
+
+pichia.dt[, CBS7435.pichiaGenome.product := sapply(CBS7435.pichiaGenome.product, function(x) unlist(strsplit(x, ";"))[[1]])]
+
+list.size <- 30
+
+kpTarg <- pichia.dt[dl.loc != "Mitochondrion" & es.chx.ms > 4 & !is.na(t.chx.ctpm)]
+setkey(kpTarg, t.chx.ctpm)
+setorderv(kpTarg, key(kpTarg), order = -1)
+
+names <- kpTarg$gene[1:list.size]
+cTPM <- as.character(round(kpTarg$t.chx.ctpm[1:list.size]))
+location <- kpTarg$dl.loc[1:list.size]
+length <- as.character(kpTarg$protein.l[1:list.size])
+product <- kpTarg$CBS7435.pichiaGenome.product[1:list.size]
+
+table <- data.frame(
+  Gene = names, cTPM = cTPM, Length = length, Description = product)
+
+knitr::kable(
+  table, booktabs = TRUE,
+  caption = 'Highest Expressed Cotranslationally Targeted Proteins',
+) %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 16) %>%
+  scroll_box(width = "100%", height = "500px")
+```
+</div>
+
+<div style="float: right; width: 100%;" class="centered">
+```{r kpPostTargets, echo=FALSE, message=FALSE, warning=FALSE}
+
+list.size <- 30
+
+kpPostTarg <- pichia.dt[dl.loc != "Mitochondrion" & es.chx.ms < 1 & !is.na(t.chx.ctpm) & sp.sp == TRUE & tc.tmd <= 1]
+setkey(kpPostTarg, t.chx.ctpm)
+setorderv(kpPostTarg, key(kpPostTarg), order = -1)
+
+names <- kpPostTarg$gene[1:list.size]
+cTPM <- as.character(round(kpPostTarg$t.chx.ctpm[1:list.size]))
+location <- kpPostTarg$dl.loc[1:list.size]
+length <- as.character(kpPostTarg$protein.l[1:list.size])
+product <- kpPostTarg$CBS7435.pichiaGenome.product[1:list.size]
+
+table <- data.frame(
+  Gene = names, cTPM = cTPM, Length = length, Description = product)
+
+knitr::kable(
+  table, booktabs = TRUE, format = "html",
+  caption = 'Highest Expressed Posttranslationally Targeted Proteins',
+) %>% kableExtra::kable_styling(bootstrap_options = "striped", font_size = 16) %>%
+  scroll_box(width = "100%", height = "500px")
+```
+</div>
+
+
+
+## Possible targets for *S. cerevisiae*  {.columns-2}
+
+<div style="float: left; width: 100%;" class="centered">
+```{r scCoTargets, echo=FALSE, message=FALSE, warning=FALSE}
+library(kableExtra)
+
+list.size <- 30
+
+yeast_2.dt[, product := sapply(product, function(x) unlist(strsplit(x, ";"))[[1]])]
+
+scTarg <- yeast_2.dt[dl.loc != "Mitochondrion" & es.chx.ms > 1 & !is.na(t.chx.ctpm)]
+setkey(scTarg, t.chx.ctpm)
+setorderv(scTarg, key(scTarg), order = -1)
+
+names <- scTarg$gene[1:list.size]
+cTPM <- as.character(round(scTarg$t.chx.ctpm[1:list.size]))
+location <- scTarg$dl.loc[1:list.size]
+length <- as.character(scTarg$protein.l[1:list.size])
+product <- scTarg$product[1:list.size]
+
+table <- data.frame(
+  Gene = names, cTPM = cTPM, Length = length, Description = product)
+
+knitr::kable(
+  table, booktabs = TRUE,
+  caption = 'Highest Expressed Cotranslationally Targeted Proteins',
+) %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 16) %>%
+  scroll_box(width = "100%", height = "500px")
+```
+</div>
+
+<div style="float: right; width: 100%;" class="centered">
+```{r scPostTargets, echo=FALSE, message=FALSE, warning=FALSE}
+
+list.size <- 30
+
+scPostTarg <- yeast_2.dt[dl.loc != "Mitochondrion" & es.chx.ms < 1 & !is.na(t.chx.ctpm) & sp.sp == TRUE & tc.tm <= 1]
+setkey(scPostTarg, t.chx.ctpm)
+setorderv(scPostTarg, key(scPostTarg), order = -1)
+
+names <- scPostTarg$gene[1:list.size]
+cTPM <- as.character(round(scPostTarg$t.chx.ctpm[1:list.size]))
+location <- scPostTarg$dl.loc[1:list.size]
+length <- as.character(scPostTarg$protein.l[1:list.size])
+product <- scPostTarg$product[1:list.size]
+
+table <- data.frame(
+  Gene = names, cTPM = cTPM, Length = length, Description = product)
+
+knitr::kable(
+  table, booktabs = TRUE, format = "html",
+  caption = 'Highest Expressed Posttranslationally Targeted Proteins',
+) %>% kableExtra::kable_styling(bootstrap_options = "striped", font_size = 16) %>%
+  scroll_box(width = "100%", height = "500px")
+```
+</div>
+
+#
+![](../images/questions/questions.png){width=100%}
+
+## S1: Nuclease footprinting and ribosome recovery {.columns-2 .font50}
+
+<div style="float: left; width: 80%;" class="left">
+![](../images/riboseq/density_gradient.png){width=100%}
+</div>
+
+<div style="float: right; width: 120%;" class="centered">
+
+![](../images/riboseq/GS115_RNAse_titration.svg){width=100%}
+
+</div>
+
+
+
+
+
+
+## S2: Comparing demands from different species {.font50}
+
+```{r tessellations, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=5.2, fig.align="left", fig.pos="ht"}
+
+one_wide <- ggdraw() + draw_image("../images/tessellations/sc_chx_t/images/wide.png") + tess_top_theme
+one_zoom <- ggdraw() + draw_image("../images/tessellations/sc_chx_t/images/zoom.png") + tess_bottom_theme
+
+two_wide <- ggdraw() + draw_image("../images/tessellations/pp_chx_t/images/wide.png") + tess_top_theme
+two_zoom <- ggdraw() + draw_image("../images/tessellations/pp_chx_t/images/zoom.png") + tess_bottom_theme
+
+three_wide <- ggdraw() + draw_image("../images/tessellations/yl_chx_t/images/wide.png") + tess_top_theme
+three_zoom <- ggdraw() + draw_image("../images/tessellations/yl_chx_t/images/zoom.png") + tess_bottom_theme
+
+four_wide <- ggdraw() + draw_image("../images/tessellations/tr_chx_t/images/wide.png") + tess_top_theme
+four_zoom <- ggdraw() + draw_image("../images/tessellations/tr_chx_t/images/zoom.png") + tess_bottom_theme
+
+one_tess <- plot_grid(one_wide, one_zoom, labels = c('S. cerevisiae'), label_size = 15, ncol = 1, align = 'v')
+two_tess <- plot_grid(two_wide, two_zoom, labels = c('K. phaffii'), label_size = 15, ncol = 1, align = 'v')
+three_tess <- plot_grid(three_wide, three_zoom, labels = c('Y. lipolytica'), label_size = 15, ncol = 1, align = 'v')
+four_tess <- plot_grid(four_wide, four_zoom, labels = c('T. reesei'), label_size = 15, ncol = 1, align = 'v')
+
+tessellations <- plot_grid(one_tess, two_tess, three_tess, four_tess, ncol = 4, align='h')
+
+tessellations
+```
+
+
+## References {.columns-2 .font40}

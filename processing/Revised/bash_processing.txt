@@ -1,0 +1,23 @@
+### Processing DeepLoc documents
+
+| grep "#" -v | grep "Predicted" -v | grep "Localization" -v | grep "Likelihood" -v | grep "Hierarchical" -v | grep "Type" -v >
+
+awk 'BEGIN{OFS="\t"; RS=""; FS="\n"}{print $1,$2}'
+
+### HiSat2
+hisat2 -x annotation_file -U input_name -p processors --max-intronlen 1000 -S output_file
+
+### CutAdapt
+cutadapt -a ADAPTER_1 -a ADAPTER_2 -a ADAPTER_n -u 2 -o output_name input_name
+
+### SignalP
+signalp_4.1 -t euk -f short input_name > output_name
+
+### Samtools multiple mapping (used for mask generation)
+samtools view -bS input_name -@ processors > output_file
+
+### Samtools single mapping
+samtools view -bS -q 60 input_file -@ processors > output_file
+
+samtools sort -@ processors input_file -o output_file
+samtools', 'index', '-@', processors input_file

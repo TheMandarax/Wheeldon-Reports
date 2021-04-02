@@ -129,3 +129,10 @@
 .font200 {
   font-size: 200%;
 }
+
+.blue-outline {
+   background-color: #9ecff7;
+   display: flex;
+   justify-content: center;
+   padding:2px;
+}

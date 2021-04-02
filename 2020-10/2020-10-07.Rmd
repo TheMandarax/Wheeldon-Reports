@@ -1,0 +1,261 @@
+---
+title: "Ribosome profiling"
+author: "Troy R. Alva"
+date: "October 7, 2020"
+output: 
+  ioslides_presentation:
+    widescreen: true
+    css: ../oral_presentation.css
+bibliography: ../bibliography.bib
+---
+
+```{r options, message=FALSE, warning=FALSE, include=FALSE}
+
+## Use cache for faster subsequent processing
+knitr::opts_chunk$set(cache=TRUE)
+opts <- options(knitr.kable.NA = "")
+
+## Necessary libraries
+library(data.table)
+library(ggplot2)
+library(cowplot)
+library(magick)
+library(scales)
+library(plotly)
+library(kableExtra)
+library(dplyr)
+library(zoo)
+
+source("../processing/Revised/helperFunctions.R")
+
+load("../data/pichia.dt.RData")
+load("../data/yeast.dt.RData")
+
+# Define colors
+assign("black", "#000000", envir = .GlobalEnv)
+assign("white", "#ffffff", envir = .GlobalEnv)
+assign("grey", "#d3d6d9", envir = .GlobalEnv)
+assign("orange", "#ff6666", envir = .GlobalEnv)
+assign("blue", "#4a708b", envir = .GlobalEnv)
+assign("lightblue1", "#809aad", envir = .GlobalEnv)
+assign("lightblue2", "#a4b7c5", envir = .GlobalEnv)
+assign("lightblue3", "#c8d4dc", envir = .GlobalEnv)
+assign("lightblue4", "#ecf0f3", envir = .GlobalEnv)
+assign("darkblue1", "#334e61", envir = .GlobalEnv)
+assign("darkblue2", "#253845", envir = .GlobalEnv)
+assign("darkblue3", "#162129", envir = .GlobalEnv)
+assign("darkblue4", "#070b0d", envir = .GlobalEnv)
+
+# Default theme
+paper_theme <- theme_light(base_size = 10) + 
+  theme(axis.text = element_text(size = rel(1.0), color = "black"),
+        title = element_text(face = "bold"),
+        axis.title = element_text(face = "bold"),
+        plot.margin = margin(7,7,7,7), 
+        panel.grid = element_blank())
+
+# Wide tessellation theme
+tess_top_theme <- theme_light(base_size = 10) + 
+  theme(axis.text = element_text(size = rel(1.0), color = "black"),
+        title = element_text(face = "bold"),
+        axis.title = element_text(face = "bold"),
+        plot.margin = margin(20,5,1,5),
+        panel.grid = element_blank(), panel.border=element_blank())
+
+# Narrow tessellation theme
+tess_bottom_theme <- theme_light(base_size = 10) + 
+  theme(axis.text = element_text(size = rel(1.0), color = "black"),
+        title = element_text(face = "bold"),
+        axis.title = element_text(face = "bold"),
+        plot.margin = margin(1,5,20,5), 
+        panel.grid = element_blank(), panel.border=element_blank())
+
+# Enrichment vs TPM theme (top)
+demands_top_theme <- paper_theme + theme(plot.margin = margin(7, 7, -5, 7),
+                      axis.text.x = element_blank(),
+                      panel.grid.major.x = element_line(size = rel(0.25), 
+                                                        color = grey, 
+                                                        linetype = "dashed"))
+# Enrichment vs TPM theme (bottom)
+demands_bottom_theme <- paper_theme + 
+  theme(plot.margin = margin(0, 7, 7, 7), 
+        panel.grid.major.x = element_line(size = rel(0.25),
+                                          color = grey, 
+                                          linetype = "dashed"))
+
+# Min reads to plot
+minimum <- 29
+
+# Options for dot plot figures
+dot.color = blue
+contrast.color = orange
+dot.size = 1
+dot.shape = 20
+line.size = 1
+
+# Sets annotation size in plots to 6 font equivalent
+annotation.size = 2.1166666666667
+
+```
+
+
+
+# Current standard
+
+## Weissman/Ingolia method {.columns-2 .font70}
+
+<div style="float: left; width: 150%;" class="centered">
+
+![](../images/riboseq/procedure.jpg){width=86%}
+
+</div>
+
+<div style="float: right; width: 50%;" class="centered">
+
+* Used in ***Protein Biogenesis Demands of the Early Secretory Pathway in Komagataella Phaffii***
+
+* Successful in **9**/20 attempts (all 8 samples in HSA expression study had rRNA contamination)
+
+</div>
+
+
+
+# Updated method
+## 1: Prepare a cell lysate {.columns-2 .font30}
+
+<div style="float: left; width: 97%;" class="left">
+
+![](../images/riboseq/culture/culture_growth.png){width=100%}
+
+</div>
+
+<div style="float: right; width: 97%;">
+
+![](../images/riboseq/prepare_lysate.png){width=80%}
+
+</div>
+
+
+
+
+
+## 2: Nuclease footprinting and ribosome recovery {.columns-2 .font30}
+
+<div style="float: left; width: 80%;" class="left">
+
+
+
+![](../images/riboseq/fractionation/density_gradient.png){width=100%}
+</div>
+
+<div style="float: right; width: 120%;" class="centered">
+
+![](../images/riboseq/fractionation/GS115_RNAse_titration.svg){width=100%}
+
+</div>
+
+
+
+
+
+## 3: Footprint fragment purification {.columns-2 .font30}
+
+<div style="float: left; width: 80%;" class="left">
+
+![](../images/riboseq/phenol_chloroform.png){width=100%}
+
+</div>
+
+<div style="float: right; width: 120%;" class="centered">
+
+![](../images/riboseq/size_selection.png){width=100%}
+
+</div>
+
+
+
+
+## 4: Dephosporylation and polyadenylation {.columns-2 .font60}
+
+<div style="float: left; width: 100%;" class="left">
+
+![](../images/riboseq/polyadenylation/polyA_18-time.png){width=100%}
+
+</div>
+
+<div style="float: right; width: 100%;" class="left">
+
+![](../images/riboseq/polyadenylation/atp_enzyme.png){width=100%}
+</div>
+
+
+
+
+## 5: Reverse transcription with TSO {.font30}
+
+![](../images/riboseq/tso/TSO.png){width=100%}
+
+@New_England_Biolabs_undated-vq
+
+## 5: Reverse transcription with TSO
+
+![](../images/riboseq/tso/tso_trial.png){width=45%}
+
+
+## 5: Inherent drawback: concatenation {.columns-2 .font30}
+
+<div style="float: left; width: 100%;" class="centered">
+![](../images/riboseq/conctatenation.jpg){width=70%}
+
+</div>
+
+<div style="float: right; width: 100%;" class="centered">
+
+![](../images/riboseq/concat_example.jpg){width=110%}
+</div>
+
+
+## 6: rRNA reduction with double stranded nuclease {.columns-2 .font30}
+
+<div style="float: left; width: 100%;" class="centered">
+
+![](../images/riboseq/depletion/DSN.png){width=100%}
+
+@Chung2015-bi
+
+</div>
+
+<div style="float: right; width: 100%;" class="centered">
+
+![](../images/riboseq/depletion/DSN_amp.jpg){width=100%}
+
+</div>
+
+
+
+## 7: PCR Amplifcation {.columns-2 .font30}
+
+<div style="float: left; width: 100%;" class="centered">
+
+![](../images/riboseq/PCR_TSO.png){width=100%}
+
+</div>
+
+<div style="float: right; width: 100%;" class="centered">
+![](../images/riboseq/new_amp.jpg){width=120%}
+</div>
+
+
+## 8: Next generation sequencing {.columns-2}
+
+<div style="float: left; width: 100%;" class="centered">
+![](../images/riboseq/sequencing/illumina4000.png){width=100%}
+
+</div>
+
+<div style="float: right; width: 100%;" class="centered">
+
+![](../images/riboseq/sequencing/sequencing.png){width=100%}
+</div>
+
+## References

@@ -1,0 +1,395 @@
+---
+title: "Ribosome profiling library prep"
+author: "Troy R. Alva"
+date: "February 26, 2020"
+output: 
+  ioslides_presentation:
+    widescreen: true
+    css: ../oral_presentation.css
+bibliography: ../bibliography.bib
+---
+
+```{r options, message=FALSE, warning=FALSE, include=FALSE}
+
+## Use cache for faster subsequent processing
+knitr::opts_chunk$set(cache=TRUE)
+
+## Necessary libraries
+library(RiboProfiling)
+library(data.table)
+library(ggplot2)
+library(cowplot)
+library(magick)
+library(grImport)
+library(scales)
+library(stats)
+library(plotly)
+library(plyr)
+library(zoo)
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(kableExtra)
+library(DiagrammeR)
+library(widgetframe)
+
+source("../processing/Revised/riboProfiling.R")
+source("../processing/Revised/helperFunctions.R")
+source("../processing/Initial/avlayortFunctions.R")
+
+# Necessary data sets
+load("../data/pichia.dt.RData")
+load("../data/yeast.dt.RData")
+load("../data/yeast_2.dt.RData")
+load("../data/m1.listPromoterCov.RData")
+load("../data/m1.matchLenDistr.dt.RData")
+load("../data/t.chx.rawCounts.RData")
+load("../data/counts.dt.RData")
+load("../data/homology.dt.RData")
+load("../data/mask.dt.RData")
+load("../data/hsa.dt.RData")
+
+# Define colors
+assign("black", "#000000", envir = .GlobalEnv)
+assign("white", "#ffffff", envir = .GlobalEnv)
+assign("grey", "#d3d6d9", envir = .GlobalEnv)
+assign("orange", "#ff6666", envir = .GlobalEnv)
+assign("blue", "#4a708b", envir = .GlobalEnv)
+assign("lightblue1", "#809aad", envir = .GlobalEnv)
+assign("lightblue2", "#a4b7c5", envir = .GlobalEnv)
+assign("lightblue3", "#c8d4dc", envir = .GlobalEnv)
+assign("lightblue4", "#ecf0f3", envir = .GlobalEnv)
+assign("darkblue1", "#334e61", envir = .GlobalEnv)
+assign("darkblue2", "#253845", envir = .GlobalEnv)
+assign("darkblue3", "#162129", envir = .GlobalEnv)
+assign("darkblue4", "#070b0d", envir = .GlobalEnv)
+
+# Default theme
+paper_theme <- theme_light(base_size = 10) + 
+  theme(axis.text = element_text(size = rel(1.0), color = black),
+        title = element_text(face = "bold"),
+        axis.title = element_text(face = "bold"),
+        plot.margin = margin(7,7,7,7), 
+        panel.grid = element_blank())
+
+# Wide tessellation theme
+tess_top_theme <- theme_light(base_size = 10) + 
+  theme(axis.text = element_text(size = rel(1.0), color = black),
+        title = element_text(face = "bold"),
+        axis.title = element_text(face = "bold"),
+        plot.margin = margin(20,5,1,5),
+        panel.grid = element_blank(), panel.border=element_blank())
+
+# Narrow tessellation theme
+tess_bottom_theme <- theme_light(base_size = 8) + 
+  theme(axis.text = element_text(size = rel(1.0), color = black),
+        title = element_text(face = "bold"),
+        axis.title = element_text(face = "bold"),
+        plot.margin = margin(1,5,20,5), 
+        panel.grid = element_blank(), panel.border=element_blank())
+
+# Enrichment vs TPM theme (top)
+demands_top_theme <- paper_theme + theme(plot.margin = margin(7, 7, -5, 7),
+                      axis.text.x = element_blank(),
+                      panel.grid.major.x = element_line(size = rel(0.25), 
+                                                        color = grey, 
+                                                        linetype = "dashed"))
+# Enrichment vs TPM theme (bottom)
+demands_bottom_theme <- paper_theme + 
+  theme(plot.margin = margin(0, 7, 7, 7), 
+        panel.grid.major.x = element_line(size = rel(0.25),
+                                          color = grey, 
+                                          linetype = "dashed"))
+
+# Min reads to plot
+minimum <- 29
+
+# Options for dot plot figures
+dot.color = blue
+contrast.color = orange
+dot.size = 1
+dot.shape = 20
+line.size = 1
+
+# Sets annotation size in plots to 6 font equivalent
+annotation.size = 2.1166666666667
+
+# Set NA values to blank on knitr tables
+opts <- options(knitr.kable.NA = "")
+
+```
+
+```{r demandsMath, message=FALSE, warning=FALSE, include=FALSE}
+cotrans <- pichia.dt %>% 
+  filter(dl.loc != "Mitochondrion" & es.3 > 1) %>% 
+  group_by(subcategory) %>% 
+  summarise(genes = n(),
+            ribosomes = sum(t.chx.rpm, na.rm = TRUE),
+            chains = sum(t.chx.ctpm, na.rm = TRUE)) %>% 
+  arrange(-chains)
+
+cotrans.ids <- pichia.dt %>% filter(dl.loc != "Mitochondrion" & es.3 > 1) %>% 
+  pull(id)
+
+posttrans <- pichia.dt %>% 
+  filter(dl.loc != "Mitochondrion" & es.3 < 1 & sp.sp == TRUE &
+           !id %in% cotrans.ids) %>% 
+  group_by(subcategory) %>% 
+  summarise(genes = n(),
+            chains = sum(t.chx.ctpm, na.rm = TRUE),
+            ribosomes = sum(t.chx.rpm, na.rm = TRUE)) %>% 
+  arrange(-chains) 
+
+pp.er.mem <- pichia.dt[dl.loc != "Mitochondrion" & 
+                         (tc.tmd >= 2 | (sp.sp == FALSE & tc.tmd ==1))]
+pp.er.sec <- pichia.dt[dl.loc != "Mitochondrion" & sp.sp == TRUE & tc.tmd <= 1]
+
+pp.mem.post.ctpm <- na.omit(pp.er.mem[es.3 < 1, t.chx.ctpm])
+pp.sec.post.ctpm <- na.omit(pp.er.sec[es.3 < 1, t.chx.ctpm])
+pp.er.post.ctpm <- sum(pp.mem.post.ctpm) + sum(pp.sec.post.ctpm)
+
+pp.mem.co.ctpm <- na.omit(pp.er.mem[es.3 >= 1, t.chx.ctpm])
+pp.sec.co.ctpm <- na.omit(pp.er.sec[es.3 >= 1, t.chx.ctpm])
+pp.er.co.ctpm <- sum(pp.mem.co.ctpm) + sum(pp.sec.co.ctpm)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### A) Sacharomyces cerevisiae
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Establish cerevisiae data sets
+demands.sc.dt <- yeast.dt[dl.loc != "Mitochondrion" & 
+                               s.chx.scaledReads > minimum &
+                               m.chx.scaledReads > minimum & 
+                               t.chx.scaledReads > minimum, 
+                             .(id, gene, description, t.chx.ctpm, t.chx.rpm,
+                               es.chx.ms, sp.sp, tc.tm)]
+sc.sec.dt <- demands.sc.dt[sp.sp == TRUE & tc.tm <= 1]
+sc.mem.dt <- demands.sc.dt[tc.tm >= 2 | (sp.sp == FALSE & tc.tm ==1)]
+
+
+### LEFT | Demand on translocatory system by numbers of nascent chains
+
+# Establish NC data sets
+sum.sc.secNC <- copy(sc.sec.dt)
+setkey(sum.sc.secNC, es.chx.ms)
+sum.sc.secNC[, sum := cumsum(t.chx.ctpm)]
+sum.sc.secNC[, norm.sum := sum/max(sum) * 100]
+
+sum.sc.memNC <- copy(sc.mem.dt)
+setkey(sum.sc.memNC, es.chx.ms)
+sum.sc.memNC[, sum := cumsum(t.chx.ctpm)]
+sum.sc.memNC[, norm.sum := sum/max(sum) * 100]
+
+
+# Establish RNC data sets
+sum.sc.secRNC <- copy(sc.sec.dt)
+setkey(sum.sc.secRNC, es.chx.ms)
+sum.sc.secRNC[, sum := cumsum(t.chx.rpm)]
+sum.sc.secRNC[, norm.sum := sum/max(sum) * 100]
+
+sum.sc.memRNC <- copy(sc.mem.dt)
+setkey(sum.sc.memRNC, es.chx.ms)
+sum.sc.memRNC[, sum := cumsum(t.chx.rpm)]
+sum.sc.memRNC[, norm.sum := sum/max(sum) * 100]
+
+
+# Establish pichia data set
+demands.pp.dt <- pichia.dt[dl.loc != "Mitochondrion" & 
+                               s.chx.scaledReads > minimum &
+                               m.chx.scaledReads > minimum & 
+                               t.chx.scaledReads > minimum, 
+                             .(id, gene, description, t.chx.ctpm, t.chx.rpm,
+                               es.3, sp.sp, tc.tmd)]
+pp.sec.dt <- demands.pp.dt[sp.sp == TRUE & tc.tmd <= 1]
+pp.mem.dt <- demands.pp.dt[tc.tmd >= 2 | (sp.sp == FALSE & tc.tmd ==1)]
+
+### LEFT | Demand on translocatory system by numbers of nascent chains
+
+# Establish NC data sets
+sum.pp.secNC <- copy(pp.sec.dt)
+setkey(sum.pp.secNC, es.3)
+sum.pp.secNC[, sum := cumsum(t.chx.ctpm)]
+sum.pp.secNC[, norm.sum := sum/max(sum) * 100]
+
+sum.pp.memNC <- copy(pp.mem.dt)
+setkey(sum.pp.memNC, es.3)
+sum.pp.memNC[, sum := cumsum(t.chx.ctpm)]
+sum.pp.memNC[, norm.sum := sum/max(sum) * 100]
+
+
+# Establish RNC data sets
+sum.pp.secRNC <- copy(pp.sec.dt)
+setkey(sum.pp.secRNC, es.3)
+sum.pp.secRNC[, sum := cumsum(t.chx.rpm)]
+sum.pp.secRNC[, norm.sum := sum/max(sum) * 100]
+
+sum.pp.memRNC <- copy(pp.mem.dt)
+setkey(sum.pp.memRNC, es.3)
+sum.pp.memRNC[, sum := cumsum(t.chx.rpm)]
+sum.pp.memRNC[, norm.sum := sum/max(sum) * 100]
+
+spDif <- pichia.dt %>% 
+  filter(dl.loc != "Mitochondrion" & sp.sp == TRUE & tc.tmd <= 1) %>% 
+  select(id, gene, description, protein.l, t.chx.ctpm, es.3)
+```
+
+## Quantifying secretory burden with Ribo-Seq {.columns-2 .font50}
+
+<div style="float: left; width: 120%;" class="centered">
+![](../images/riboseq/procedure.jpg){width=90%}
+</div>
+
+<div style="float: right; width: 85%;" class="centered">
+```{r enrichment, echo=FALSE, message=FALSE, warning=FALSE, fig.align="left", fig.pos="ht", fig.width=4.5, fig.height=5}
+
+pppp.dt <- pichia.dt[s1.scaledReads > 30 & m1.scaledReads > 30 &
+                       s3.scaledReads > 30 & m3.scaledReads > 30]
+inf_na(pppp.dt)
+na_zero(pppp.dt)
+
+scpp.dt <- merge(pichia.dt[gene %in% yeast.dt$gene &
+                             s3.scaledReads > 30 &
+                             m3.scaledReads > 30, 
+                           .(S288C.gene, GS115.es.3 = es.3)], 
+                 yeast.dt[gene %in% pichia.dt$gene &
+                             s.chx.scaledReads > 30 &
+                             m.chx.scaledReads > 30, 
+                          .(S288C.gene = gene, S288C.es.chx.ms = es.chx.ms)], 
+                 by.x = 'S288C.gene', by.y = 'S288C.gene')
+inf_na(scpp.dt)
+na_zero(scpp.dt)
+
+if (min(pppp.dt$es.1) < min(scpp.dt$GS115.es.3)) {x0 <- min(pppp.dt$es.1)} else {x0 <- min(scpp.dt$GS115.es.3)}
+if (max(pppp.dt$es.1) > max(scpp.dt$GS115.es.3)) {xf <- max(pppp.dt$es.1)} else {xf <- max(scpp.dt$GS115.es.3)}
+if (min(pppp.dt$es.3) < min(scpp.dt$S288C.es.chx.ms)) {y0 <- min(pppp.dt$es.3)} else {x0 <- min(scpp.dt$S288C.es.chx.ms)}
+if (max(pppp.dt$es.1) > max(scpp.dt$S288C.es.chx.ms)) {yf <- max(pppp.dt$es.1)} else {xf <- max(scpp.dt$S288C.es.chx.ms)}
+
+
+scatter.pppp <- ggplot(data = pppp.dt,
+                       aes(x = es.1, y = es.3)) +
+  geom_point(color = blue,
+             size = 1,
+             shape = 20,
+             na.rm = TRUE) +
+  labs(title = "Enrichment is conserved",
+       x = expression(bold(paste(bolditalic("K. phaffii"), " 1 enrichment"))),
+       y = expression(bold(paste(bolditalic("K. phaffii"), " 2 enrichment")))) +
+  annotate("text",
+           x = x0 + (xf - x0)/10,
+           y = max(yf),
+           label = paste0(
+             "Pearson's r = ", round(cor.test(
+               pppp.dt$es.1, pppp.dt$es.3, method = "pearson")$estimate, 2)),
+           size = 3) +
+  scale_x_continuous(limits = c(x0, xf)) +
+  scale_y_continuous(limits = c(y0, yf)) +
+  paper_theme
+ 
+memVsol.dt <- pichia.dt[m.chx.scaledReads > minimum & 
+                            s.chx.scaledReads > minimum, 
+                          .(id, gene, membrane=m.chx.ctpm, soluble=s.chx.ctpm, enrichment=es.chx.ms)]
+
+if (max(log(memVsol.dt$soluble)) > max(log(memVsol.dt$membrane))) {
+  bigVal <- max(log(memVsol.dt$soluble))
+} else {bigVal <- max(log(memVsol.dt$membrane))}
+if (min(log(memVsol.dt$soluble)) < min(log(memVsol.dt$membrane))) {
+  smallVal <- min(log(memVsol.dt$soluble))
+} else {smallVal <- min(log(memVsol.dt$membrane))}
+
+scatter.memVsol <- ggplot(data = memVsol.dt) +
+  geom_point(aes(x = log(soluble), y = log(membrane), text1=enrichment),
+             color = dot.color, 
+             size = 0.7, 
+             shape = dot.shape,
+             na.rm = TRUE) +
+  labs(x = "Soluble log expression",
+       y = "Membrane log expression", 
+       title = "Expression on membrane and cytosol") +
+    geom_abline(slope = 1, 
+              intercept = 1, 
+              size = 2,
+              alpha = 0.25, 
+              color = contrast.color) +
+  scale_x_continuous(limits = c(smallVal, bigVal)) +
+  scale_y_continuous(limits = c(smallVal, bigVal)) +
+  paper_theme
+
+ plot_grid(scatter.memVsol, scatter.pppp, 
+           ncol = 1, align = 'hv')
+```
+</div>
+
+
+# Strategy
+
+## Culture, harvest and lyse {.columns-2 .font50}
+
+<div style="float: left; width: 100%;" class="left">
+
+![](../images/riboseq/culture/culture_growth.png){width=100%}
+
+</div>
+
+<div style="float: right; width: 100%;" class="centered">
+![](../images/riboseq/prepare_lysate.png){width=100%}
+</div>
+
+## Nuclease footprinting and ribosome recovery {.columns-2 .font70}
+
+<div style="float: left; width: 80%;" class="left">
+![](../images/riboseq/fractionation/density_gradient.png){width=100%}
+</div>
+
+<div style="float: right; width: 120%;" class="centered">
+
+![](../images/riboseq/fractionation/GS115_RNAse_titration.svg){width=100%}
+</div>
+
+## Footprint fragment purification
+
+<div class="centered">
+![](../images/riboseq/size/size_selection.png){width=90%}
+</div>
+
+## Dephosporylation, linker ligation, and pooling
+
+<div class="centered">
+
+![](../images/riboseq/linker_ligation/ligation.png){width=90%}
+</div>
+
+## rRNA depletion using Ribo-Zero
+
+<div class="centered">
+![](../images/riboseq/depletion/ribozero.png){width=90%}
+</div>
+
+## Reverse transcription and circularization 
+
+<div class="centered">
+![](../images/riboseq/rt/rt.png){width=90%}
+</div>
+
+
+## rRNA depletion using DSN
+
+<div class="centered">
+![](../images/riboseq/depletion/dsn_crab.png){width=90%}
+</div>
+
+## Library construction PCR
+
+<div class="centered">
+![](../images/design/29_amp_linker.png){width=90%}
+![](../images/riboseq/amplification/amplified.png){width=90%}
+</div>
+
+## Sequencing
+
+<div class="centered">
+![](../images/riboseq/sequencing/nextSeq.png){width=100%}
+</div>
+
+#
+![](../images/questions/questions.png){width=100%}
+
